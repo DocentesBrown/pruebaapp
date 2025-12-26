@@ -2,76 +2,78 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tienda Cloud Admin</title>
     <style>
         :root { --primary: #008069; --accent: #e53935; --bg: #f4f4f9; --card: #ffffff; --text: #333; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         
         /* HEADER */
         header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .brand { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
-        .admin-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
-        .admin-btn:hover { background: rgba(255,255,255,0.3); }
+        .brand { font-weight: 800; font-size: 1.2rem; }
+        .admin-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
 
         /* LOADING */
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; }
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; }
         .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* ADMIN PANEL */
-        #adminPanel { display: none; background: white; padding: 20px; border-bottom: 2px solid #ddd; animation: slideDown 0.3s ease-out; }
+        #adminPanel { display: none; background: white; padding: 20px; border-bottom: 2px solid #ddd; animation: slideDown 0.3s; }
         .admin-visible #adminPanel { display: block; }
         @keyframes slideDown { from {transform: translateY(-20px); opacity:0;} to {transform: translateY(0); opacity:1;} }
         
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; transition: 0.2s; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; }
         input:focus { border-color: var(--primary); }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-sec { background: #999; margin-top: 5px; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
+        .btn-sec { background: #777; }
+        
+        /* FILE UPLOAD STYLE */
+        .file-upload-wrapper { position: relative; margin-bottom: 10px; border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; }
+        .file-upload-wrapper input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer; }
+        .upload-text { color: #666; font-size: 0.9rem; pointer-events: none; }
 
-        /* CATEGORIAS */
-        .cat-bar { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: var(--bg); scrollbar-width: none; }
-        .cat-pill { background: white; padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; white-space: nowrap; cursor: pointer; transition: 0.2s; font-size: 0.9rem; font-weight: 500; color: #666; }
-        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(0,128,105,0.3); }
+        /* LOGIN MODAL */
+        .login-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 30px; border-radius: 15px; width: 80%; max-width: 300px; text-align: center; }
+        .login-box h3 { margin-top: 0; }
+        .link-btn { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 10px; font-size: 0.8rem; }
 
-        /* GRILLA */
+        /* UI ELEMENTS */
+        .cat-bar { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: var(--bg); }
+        .cat-pill { background: white; padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; white-space: nowrap; cursor: pointer; }
+        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-3px); }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
         .card.no-stock { opacity: 0.6; }
         
         .img-box { width: 100%; height: 160px; background: #eee; position: relative; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .badge { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; text-transform: uppercase; }
+        .badge { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; }
         .bg-promo { background: var(--accent); }
-        .bg-stock { background: #333; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem; }
+        .bg-stock { background: #333; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* ADMIN ACTIONS ON CARD */
         .card-actions { position: absolute; top: 5px; right: 5px; display: none; gap: 5px; z-index: 10; }
         .admin-visible .card-actions { display: flex; }
-        .act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 1rem; }
-        .btn-edit { background: white; color: #333; }
+        .act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: white; shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-del { background: #ff4444; color: white; }
 
         .info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
-        .title { font-weight: 600; font-size: 0.95rem; margin-bottom: 5px; color: var(--text); }
         .prices { margin-bottom: 10px; }
         .old { text-decoration: line-through; color: #999; font-size: 0.85rem; margin-right: 5px; }
         .curr { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
         .promo { color: var(--accent); }
         
         .buy-btn { margin-top: auto; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
-        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
-
-        /* CARRITO */
-        .cart-fab { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 12px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 500; }
         
-        /* MODAL */
+        /* CART */
+        .cart-fab { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 12px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 500; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
-        .modal-body { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 80vh; overflow-y: auto; box-shadow: 0 -5px 30px rgba(0,0,0,0.2); }
-        .cart-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .wa-btn { background: #25D366; color: white; text-align: center; padding: 15px; border-radius: 10px; display: block; text-decoration: none; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
+        .modal-body { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 80vh; overflow-y: auto; }
+        .cart-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .wa-btn { background: #25D366; color: white; text-align: center; padding: 15px; border-radius: 10px; display: block; text-decoration: none; font-weight: bold; margin-top: 20px; }
 
     </style>
 </head>
@@ -79,33 +81,62 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:20px; color:#666; font-size:0.9rem;">Conectando a la Nube...</p>
+        <p id="loaderMsg" style="margin-top:20px; color:#666; font-size:0.9rem;">Cargando Tienda...</p>
     </div>
 
     <header>
-        <div class="brand">Mi Tienda Cloud ☁️</div>
-        <button class="admin-btn" onclick="toggleAdmin()">🔒 Admin</button>
+        <div class="brand">Mi Tienda Cloud</div>
+        <button class="admin-btn" onclick="checkLoginAccess()">🔒 Admin</button>
     </header>
 
+    <div class="login-overlay" id="loginModal">
+        <div class="login-box" id="loginFormBox">
+            <h3>Acceso Admin</h3>
+            <input type="text" id="loginUser" placeholder="Usuario">
+            <input type="password" id="loginPass" placeholder="Contraseña">
+            <button class="btn-main" onclick="doLogin()">Entrar</button>
+            <button class="link-btn" onclick="closeLogin()">Cancelar</button>
+        </div>
+
+        <div class="login-box" id="changePassBox" style="display:none;">
+            <h3>Cambiar Clave</h3>
+            <input type="password" id="oldPass" placeholder="Clave Actual">
+            <input type="password" id="newPass" placeholder="Nueva Clave">
+            <input type="password" id="confirmPass" placeholder="Confirmar Nueva Clave">
+            <button class="btn-main" onclick="saveNewPass()">Guardar Nueva Clave</button>
+            <button class="link-btn" onclick="togglePassMode(false)">Volver</button>
+        </div>
+    </div>
+
     <div id="adminPanel">
-        <h3 id="formTitle">Nuevo Producto</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 id="formTitle" style="margin:0;">Nuevo Producto</h3>
+            <button class="link-btn" onclick="togglePassMode(true)" style="margin:0;">Cambiar Clave</button>
+        </div>
+
         <input type="hidden" id="editId">
         
         <input type="text" id="pName" placeholder="Nombre del Producto">
         <div class="form-row">
             <input type="number" id="pPrice" placeholder="Precio ($)">
-            <input type="number" id="pPromo" placeholder="Precio Promo (Opcional)">
+            <input type="number" id="pPromo" placeholder="Promo (Opcional)">
         </div>
-        <input type="text" id="pImg" placeholder="Link de Imagen (https://...)">
+
+        <div class="file-upload-wrapper">
+            <span id="uploadStatus" class="upload-text">📸 Toca para tomar foto o elegir de galería</span>
+            <input type="file" id="fileInput" accept="image/*" onchange="uploadImage()">
+        </div>
+        <input type="text" id="pImg" placeholder="O pega el link aquí..." style="font-size:12px; color:#666;">
+
         <div class="form-row">
             <input type="text" id="pCat" placeholder="Categoría" list="catDatalist">
             <select id="pStock"><option value="SI">Hay Stock</option><option value="NO">Sin Stock</option></select>
         </div>
         <datalist id="catDatalist"></datalist>
 
-        <button class="btn-main" onclick="saveProductToServer()" id="btnSave">Guardar en la Nube</button>
-        <button class="btn-main btn-sec" onclick="cancelEdit()" id="btnCancel" style="display:none">Cancelar</button>
-        <small style="display:block; margin-top:10px; color:#666; text-align:center;">* Los cambios tardan unos segundos en reflejarse.</small>
+        <button class="btn-main" onclick="saveProductToServer()" id="btnSave">Guardar Producto</button>
+        <button class="btn-main btn-sec" onclick="cancelEdit()" id="btnCancel" style="display:none">Cancelar Edición</button>
+        <button class="btn-main btn-sec" onclick="logout()" style="background:#333; margin-top:10px;">Cerrar Sesión</button>
     </div>
 
     <div class="cat-bar" id="catContainer"></div>
@@ -114,47 +145,144 @@
     <div class="cart-fab" id="cartBtn" onclick="openCart()" style="display:none;">
         <span>🛒 <b id="cartCount">0</b></span> <b id="cartTotal">$0</b>
     </div>
-
     <div class="modal-overlay" id="cartModal" onclick="if(event.target===this)closeCart()">
         <div class="modal-body">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Tu Pedido</h2>
-                <span onclick="closeCart()" style="font-size:1.5rem; cursor:pointer;">✕</span>
-            </div>
+            <div style="display:flex; justify-content:space-between;"><h2>Pedido</h2><span onclick="closeCart()">✕</span></div>
             <div id="cartList"></div>
-            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.2rem; margin-top:20px;">
-                <span>Total:</span> <span id="modalTotal">$0</span>
-            </div>
-            <a href="#" id="waLink" class="wa-btn" target="_blank">Enviar a WhatsApp</a>
-            <p onclick="clearCart()" style="text-align:center; color:#999; margin-top:15px; text-decoration:underline; cursor:pointer;">Vaciar carrito</p>
+            <h3>Total: <span id="modalTotal">$0</span></h3>
+            <a href="#" id="waLink" class="wa-btn" target="_blank">Enviar Pedido</a>
+            <p onclick="clearCart()" style="text-align:center; margin-top:15px; text-decoration:underline;">Vaciar</p>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        //  TUS DATOS INTEGRADOS
-        // ============================================================
+        // ==========================================
+        //  CONFIGURACIÓN (¡EDITAR ESTO!)
+        // ==========================================
         
-        // Conexión con tu Google Script
         const API_URL = "https://script.google.com/macros/s/AKfycby_4tY0H6YCA-PY5OiCyZJ72MufCkX7chOvhWX1BuJNL42blEFOIHAA6aByVSBGO9mP1w/exec";
-
-        // Tu WhatsApp
         const PHONE = "5491138614767"; 
+        
+        // 🔑 TU API KEY DE IMGBB (Consíguela en api.imgbb.com)
+        const IMGBB_KEY = "PEGAR_TU_API_KEY_DE_IMGBB_AQUI"; 
 
-        // ============================================================
+        // ==========================================
 
-        let products = [];
-        let cart = [];
-        let activeCat = 'all';
+        let products = [], cart = [], activeCat = 'all';
+        let isLoggedIn = false;
 
-        // --- INICIALIZAR ---
-        async function init() {
-            await fetchProducts();
+        // --- SISTEMA DE LOGIN ---
+        function getCreds() {
+            const stored = localStorage.getItem('shop_creds');
+            return stored ? JSON.parse(stored) : { u: 'LUCAS', p: 'FAGA' };
         }
 
-        // --- CONEXIÓN CON GOOGLE SHEETS ---
-        async function fetchProducts() {
-            showLoader(true);
+        function checkLoginAccess() {
+            if (isLoggedIn) {
+                // Si ya está logueado, ocultar/mostrar panel
+                document.getElementById('mainBody').classList.toggle('admin-visible');
+            } else {
+                // Si no, abrir modal
+                document.getElementById('loginModal').style.display = 'flex';
+                document.getElementById('loginFormBox').style.display = 'block';
+                document.getElementById('changePassBox').style.display = 'none';
+            }
+        }
+
+        function doLogin() {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            const creds = getCreds();
+
+            if (u === creds.u && p === creds.p) {
+                isLoggedIn = true;
+                closeLogin();
+                document.getElementById('mainBody').classList.add('admin-visible');
+                // Limpiar campos
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
+            } else {
+                alert("Usuario o Clave incorrectos");
+            }
+        }
+
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('mainBody').classList.remove('admin-visible');
+            alert("Sesión Cerrada");
+        }
+
+        function togglePassMode(showChange) {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('loginFormBox').style.display = showChange ? 'none' : 'block';
+            document.getElementById('changePassBox').style.display = showChange ? 'block' : 'none';
+        }
+
+        function saveNewPass() {
+            const old = document.getElementById('oldPass').value;
+            const newP = document.getElementById('newPass').value;
+            const confP = document.getElementById('confirmPass').value;
+            const creds = getCreds();
+
+            if (old !== creds.p) return alert("La clave actual es incorrecta");
+            if (newP !== confP) return alert("La confirmación no coincide");
+            if (newP.length < 4) return alert("La clave es muy corta");
+
+            const newCreds = { u: 'LUCAS', p: newP };
+            localStorage.setItem('shop_creds', JSON.stringify(newCreds));
+            alert("¡Clave cambiada con éxito!");
+            closeLogin();
+            
+            // Limpiar
+            document.getElementById('oldPass').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('confirmPass').value = '';
+        }
+
+        // --- SUBIDA DE IMÁGENES (IMGBB) ---
+        async function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const status = document.getElementById('uploadStatus');
+            const urlInput = document.getElementById('pImg');
+
+            if (!file) return;
+            if (IMGBB_KEY.includes("PEGAR_TU")) return alert("Falta configurar la API KEY de ImgBB en el código.");
+
+            status.innerText = "⏳ Subiendo imagen... espera...";
+            status.style.fontWeight = "bold";
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    urlInput.value = data.data.url; // Poner link en el input
+                    status.innerText = "✅ ¡Foto cargada correctamente!";
+                    status.style.color = "green";
+                } else {
+                    throw new Error("Fallo en ImgBB");
+                }
+            } catch (err) {
+                status.innerText = "❌ Error al subir. Intenta de nuevo.";
+                status.style.color = "red";
+                alert("Error subiendo imagen: " + err);
+            }
+        }
+
+        // --- LÓGICA DE TIENDA Y GOOGLE SHEETS ---
+        async function init() {
+            showLoader(true, "Conectando...");
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
@@ -162,7 +290,6 @@
                 renderCats();
                 renderGrid('all');
             } catch (err) {
-                alert("Hubo un problema de conexión. Verifica que hayas publicado el Script como 'Cualquier Usuario'.");
                 console.error(err);
             } finally {
                 showLoader(false);
@@ -170,185 +297,145 @@
         }
 
         async function saveProductToServer() {
-            const id = document.getElementById('editId').value || Date.now();
-            const name = document.getElementById('pName').value;
-            const price = document.getElementById('pPrice').value;
-            const promo = document.getElementById('pPromo').value;
-            const img = document.getElementById('pImg').value || "https://via.placeholder.com/150";
-            const cat = document.getElementById('pCat').value || "General";
-            const stock = document.getElementById('pStock').value; // SI o NO
+            const imgVal = document.getElementById('pImg').value;
+            if (!imgVal) return alert("Debes subir una foto o pegar un link.");
 
-            if(!name || !price) return alert("Nombre y precio obligatorios");
-
-            const isEdit = document.getElementById('editId').value !== "";
             const payload = {
-                action: isEdit ? "edit" : "add",
-                id: id,
-                name: name,
-                price: Number(price),
-                promo: promo ? Number(promo) : "",
-                img: img,
-                cat: cat,
-                stock: stock
+                action: document.getElementById('editId').value ? "edit" : "add",
+                id: document.getElementById('editId').value || Date.now(),
+                name: document.getElementById('pName').value,
+                price: document.getElementById('pPrice').value,
+                promo: document.getElementById('pPromo').value,
+                img: imgVal,
+                cat: document.getElementById('pCat').value || "Varios",
+                stock: document.getElementById('pStock').value
             };
 
-            showLoader(true);
+            showLoader(true, "Guardando...");
             try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-                
+                await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 cancelEdit();
-                await fetchProducts();
-                // alert(isEdit ? "Producto editado" : "Producto guardado");
-
+                await init(); // Recargar
+                alert("Guardado con éxito");
             } catch (err) {
-                alert("Error al guardar: " + err);
+                alert("Error al guardar");
+            } finally {
                 showLoader(false);
             }
         }
 
         async function deleteProduct(id) {
-            if(!confirm("¿Seguro que quieres borrar este producto de la hoja?")) return;
-            
-            showLoader(true);
+            if(!confirm("¿Borrar?")) return;
+            showLoader(true, "Borrando...");
             try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "delete", id: id })
-                });
-                await fetchProducts();
-            } catch (err) {
-                alert("Error al borrar");
-                showLoader(false);
-            }
+                await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) });
+                await init();
+            } catch(e) { alert("Error"); } 
+            finally { showLoader(false); }
         }
 
-        // --- UI & LOGIC ---
-        function showLoader(show) {
+        // --- UI AUXILIARES ---
+        function showLoader(show, msg) {
             const l = document.getElementById('loader');
-            if(show) { l.style.display = 'flex'; l.style.opacity = '1'; }
-            else { l.style.opacity = '0'; setTimeout(()=>l.style.display='none', 300); }
+            if(msg) document.getElementById('loaderMsg').innerText = msg;
+            l.style.display = show ? 'flex' : 'none';
         }
-
-        function toggleAdmin() { document.getElementById('mainBody').classList.toggle('admin-visible'); }
 
         function renderCats() {
             const cats = ['Todos', ...new Set(products.map(p => p.cat))];
             const c = document.getElementById('catContainer');
             const dl = document.getElementById('catDatalist');
             c.innerHTML = ''; dl.innerHTML = '';
-            
-            cats.forEach(cat => {
-                const key = cat === 'Todos' ? 'all' : cat;
-                c.innerHTML += `<div class="cat-pill ${activeCat===key?'active':''}" onclick="filter('${key}')">${cat}</div>`;
-                if(cat!=='Todos') dl.innerHTML += `<option value="${cat}">`;
+            cats.forEach(x => {
+                c.innerHTML += `<div class="cat-pill ${activeCat===x?'active':''}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`;
+                if(x!=='Todos') dl.innerHTML += `<option value="${x}">`;
             });
         }
+        function filter(c) { activeCat=c; renderCats(); renderGrid(c); }
 
-        function filter(cat) { activeCat = cat; renderCats(); renderGrid(cat); }
-
-        function renderGrid(cat) {
-            const g = document.getElementById('grid');
-            g.innerHTML = '';
-            const list = cat === 'all' ? products : products.filter(p => p.cat === cat);
-            
-            if(list.length === 0) return g.innerHTML = '<p style="text-align:center; width:100%; color:#999; margin-top:20px;">No hay productos en esta categoría.</p>';
-
+        function renderGrid(c) {
+            const g = document.getElementById('grid'); g.innerHTML = '';
+            const list = c === 'all' ? products : products.filter(p => p.cat === c);
             list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
-                const priceHtml = isPromo 
-                    ? `<span class="old">$${p.price}</span> <span class="curr promo">$${p.promoPrice}</span>` 
-                    : `<span class="curr">$${p.price}</span>`;
-
                 g.innerHTML += `
-                <div class="card ${!p.hasStock ? 'no-stock' : ''}">
+                <div class="card ${!p.hasStock?'no-stock':''}">
                     <div class="card-actions">
-                        <button class="act-btn btn-edit" onclick='editP(${JSON.stringify(p)})'>✏️</button>
+                        <button class="act-btn" onclick='editP(${JSON.stringify(p)})'>✏️</button>
                         <button class="act-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button>
                     </div>
                     <div class="img-box">
-                        ${isPromo ? '<span class="badge bg-promo">Oferta</span>' : ''}
-                        ${!p.hasStock ? '<span class="badge bg-stock">AGOTADO</span>' : ''}
-                        <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen'">
+                        ${isPromo?'<span class="badge bg-promo">OFERTA</span>':''}
+                        ${!p.hasStock?'<span class="badge bg-stock">AGOTADO</span>':''}
+                        <img src="${p.img}">
                     </div>
                     <div class="info">
-                        <div class="title">${p.name}</div>
-                        <div class="prices">${priceHtml}</div>
-                        <button class="buy-btn" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>
-                            ${p.hasStock ? 'AGREGAR' : 'SIN STOCK'}
-                        </button>
+                        <div style="font-weight:bold; margin-bottom:5px;">${p.name}</div>
+                        <div class="prices">
+                            ${isPromo ? `<span class="old">$${p.price}</span> <span class="curr promo">$${p.promoPrice}</span>` : `<span class="curr">$${p.price}</span>`}
+                        </div>
+                        <button class="buy-btn" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'AGREGAR':'SIN STOCK'}</button>
                     </div>
                 </div>`;
             });
         }
 
         function editP(p) {
-            if(!document.getElementById('mainBody').classList.contains('admin-visible')) toggleAdmin();
+            if(!isLoggedIn) return checkLoginAccess();
             document.getElementById('editId').value = p.id;
             document.getElementById('pName').value = p.name;
             document.getElementById('pPrice').value = p.price;
-            document.getElementById('pPromo').value = p.promoPrice || '';
+            document.getElementById('pPromo').value = p.promoPrice||'';
             document.getElementById('pImg').value = p.img;
             document.getElementById('pCat').value = p.cat;
-            document.getElementById('pStock').value = p.hasStock ? "SI" : "NO";
-
-            document.getElementById('formTitle').innerText = "Editar: " + p.name;
-            document.getElementById('btnSave').innerText = "Guardar Cambios";
+            document.getElementById('pStock').value = p.hasStock?'SI':'NO';
+            document.getElementById('uploadStatus').innerText = "Imagen cargada (link)";
+            document.getElementById('btnSave').innerText = "Actualizar";
             document.getElementById('btnCancel').style.display = 'block';
+            document.getElementById('formTitle').innerText = "Editar Producto";
             window.scrollTo(0,0);
         }
-
         function cancelEdit() {
             document.getElementById('editId').value = '';
             document.getElementById('pName').value = '';
             document.getElementById('pPrice').value = '';
             document.getElementById('pPromo').value = '';
             document.getElementById('pImg').value = '';
-            document.getElementById('pCat').value = '';
-            document.getElementById('pStock').value = 'SI';
-            
-            document.getElementById('formTitle').innerText = "Nuevo Producto";
-            document.getElementById('btnSave').innerText = "Guardar en la Nube";
+            document.getElementById('uploadStatus').innerText = "📸 Toca para tomar foto";
+            document.getElementById('fileInput').value = ""; // Reset file
+            document.getElementById('btnSave').innerText = "Guardar Producto";
             document.getElementById('btnCancel').style.display = 'none';
+            document.getElementById('formTitle').innerText = "Nuevo Producto";
         }
 
-        // --- CARRITO ---
+        // --- CART ---
         function addCart(id) {
-            const p = products.find(x => x.id == id);
-            if(p && p.hasStock) { cart.push(p); updateCart(); }
+            const p = products.find(x=>x.id==id);
+            if(p&&p.hasStock){ cart.push(p); updateCart(); }
         }
         function updateCart() {
-            const tot = cart.reduce((acc, i) => acc + (i.promoPrice||i.price), 0);
+            const t = cart.reduce((a,b)=>a+(b.promoPrice||b.price),0);
             document.getElementById('cartCount').innerText = cart.length;
-            document.getElementById('cartTotal').innerText = '$'+tot;
-            document.getElementById('modalTotal').innerText = '$'+tot;
-            document.getElementById('cartBtn').style.display = cart.length ? 'flex' : 'none';
+            document.getElementById('cartTotal').innerText = '$'+t;
+            document.getElementById('modalTotal').innerText = '$'+t;
+            document.getElementById('cartBtn').style.display = cart.length?'flex':'none';
         }
         function openCart() {
             const l = document.getElementById('cartList'); l.innerHTML = '';
-            const grp = {};
-            cart.forEach(i => { if(!grp[i.id]) grp[i.id]={...i, qty:0}; grp[i.id].qty++; });
-            
-            let msg = "👋 Hola! Quiero realizar el siguiente pedido:%0A%0A";
-            Object.values(grp).forEach(i => {
+            const g = {};
+            cart.forEach(i=>{ if(!g[i.id])g[i.id]={...i,q:0}; g[i.id].q++; });
+            let msg = "Hola! Quiero pedir:%0A";
+            Object.values(g).forEach(i=>{
                 const pr = i.promoPrice||i.price;
-                l.innerHTML += `
-                <div class="cart-row">
-                    <span>${i.name} (x${i.qty})</span>
-                    <b>$${pr*i.qty}</b>
-                </div>`;
-                msg += `• *${i.qty}x ${i.name}*: $${pr*i.qty}%0A`;
+                l.innerHTML+=`<div class="cart-row"><span>${i.name} (x${i.q})</span><b>$${pr*i.q}</b></div>`;
+                msg+=`- ${i.name} (x${i.q}): $${pr*i.q}%0A`;
             });
-            msg += `%0A💰 *TOTAL: $${cart.reduce((a,b)=>a+(b.promoPrice||b.price),0)}*`;
-            
-            // Link WA
-            document.getElementById('waLink').href = `https://wa.me/${PHONE}?text=${msg}`;
-            document.getElementById('cartModal').style.display = 'flex';
+            msg+=`%0ATotal: $${cart.reduce((a,b)=>a+(b.promoPrice||b.price),0)}`;
+            document.getElementById('waLink').href=`https://wa.me/${PHONE}?text=${msg}`;
+            document.getElementById('cartModal').style.display='flex';
         }
-        function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
-        function clearCart() { cart=[]; updateCart(); closeCart(); }
+        function closeCart(){document.getElementById('cartModal').style.display='none';}
+        function clearCart(){cart=[];updateCart();closeCart();}
 
         init();
     </script>
