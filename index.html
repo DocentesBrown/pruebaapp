@@ -2,211 +2,316 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mi Tienda Online</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Mi Tienda</title>
     <style>
-        /* ESTILOS VISUALES */
-        :root { --primary: #008069; --accent: #e53935; --bg: #f4f4f9; --card: #ffffff; --text: #333; --sidebar-width: 280px; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
-        
-        /* HEADER MEJORADO */
-        header { background: var(--primary); color: white; padding: 10px 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: 50px; }
-        .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; }
-        .brand { font-weight: 800; font-size: 1.2rem; flex-grow: 1; }
-        .admin-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
+        /* --- VARIABLES ESTILO IOS --- */
+        :root {
+            --primary: #007AFF; /* Azul iOS */
+            --brand-color: #008069; /* Tu verde original para la marca */
+            --accent: #FF3B30; /* Rojo iOS */
+            --bg: #F2F2F7; /* Fondo gris claro iOS */
+            --card: #FFFFFF;
+            --text: #000000;
+            --text-secondary: #8E8E93;
+            --separator: #C6C6C8;
+            --sidebar-width: 300px;
+            --radius-l: 16px;
+            --radius-m: 12px;
+            --radius-s: 8px;
+        }
 
-        /* MENU LATERAL (SIDEBAR) */
-        .sidebar { position: fixed; top: 0; left: calc(var(--sidebar-width) * -1); width: var(--sidebar-width); height: 100%; background: white; z-index: 2000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
-        .sidebar.open { left: 0; }
-        
-        .sidebar-header { background: var(--primary); color: white; padding: 20px; font-weight: bold; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
-        .close-menu { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-        
-        .sidebar-content { flex-grow: 1; overflow-y: auto; padding: 20px 0; }
-        .sidebar-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 1rem; color: #444; transition: 0.2s; }
-        .sidebar-item:hover, .sidebar-item.active { background: #f0f7f6; color: var(--primary); font-weight: bold; }
-        
-        .sidebar-footer { padding: 20px; background: #f9f9f9; border-top: 1px solid #ddd; }
-        .contact-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #333; margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px; border: 1px solid #ddd; font-weight: 500; }
-        .contact-link.wa { color: #25D366; border-color: #25D366; }
-        .contact-link.ig { color: #E1306C; border-color: #E1306C; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            /* Padding seguro para el notch y la barra inferior */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* OVERLAY (FONDO OSCURO) */
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1999; display: none; opacity: 0; transition: opacity 0.3s; }
+        /* --- HEADER NATIVO --- */
+        header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text);
+            padding: 12px 16px;
+            position: sticky;
+            top: 0; /* Se ajusta debajo del notch */
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid var(--separator);
+            height: 44px; /* Altura estándar iOS */
+        }
+        .brand { font-weight: 700; font-size: 1.4rem; color: var(--text); letter-spacing: -0.5px; text-align: center; flex-grow: 1; }
+        .header-btn { background: none; border: none; color: var(--primary); font-size: 1rem; font-weight: 500; cursor: pointer; padding: 8px 0; transition: opacity 0.2s; }
+        .header-btn:active { opacity: 0.5; }
+        .menu-icon { font-size: 1.5rem; color: var(--primary); }
+
+        /* --- SIDEBAR (MENU) --- */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1999; display: none; opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(2px); }
         .menu-overlay.open { display: block; opacity: 1; }
+        
+        .sidebar { 
+            position: fixed; top: 0; left: calc(var(--sidebar-width) * -1); width: var(--sidebar-width); height: 100%; 
+            background: var(--bg); z-index: 2000; transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            display: flex; flex-direction: column; box-shadow: 2px 0 12px rgba(0,0,0,0.1); 
+            padding-top: env(safe-area-inset-top);
+        }
+        .sidebar.open { transform: translateX(var(--sidebar-width)); }
+        
+        .sidebar-header { padding: 25px 20px; font-weight: 800; font-size: 1.8rem; display: flex; justify-content: space-between; align-items: center; color: var(--text); background: var(--card); }
+        .close-menu { background: none; border: none; color: var(--separator); font-size: 1.5rem; cursor: pointer; }
+        
+        .sidebar-content { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .sidebar-group { background: var(--card); border-radius: var(--radius-m); overflow: hidden; margin-bottom: 20px; }
+        .sidebar-item { padding: 16px 20px; border-bottom: 0.5px solid var(--separator); cursor: pointer; font-size: 1.1rem; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-item:last-child { border-bottom: none; }
+        .sidebar-item:active { background: #E5E5EA; }
+        .sidebar-item.active { color: var(--primary); font-weight: 600; }
+        .sidebar-item::after { content: '›'; color: var(--separator); font-weight: 300; font-size: 1.4rem; }
+        
+        .sidebar-footer { padding: 20px; background: var(--bg); }
+        .contact-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; margin-bottom: 12px; padding: 14px; border-radius: var(--radius-m); font-weight: 600; font-size: 1.1rem; justify-content: center; }
+        .contact-link.wa { background: #25D366; }
+        .contact-link.ig { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); }
 
-        /* LOADER */
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ADMIN */
-        #adminPanel { display: none; background: white; padding: 20px; border-bottom: 2px solid #ddd; animation: slideDown 0.3s; }
+        /* --- ADMIN PANEL (Estilo Formulario iOS) --- */
+        #adminPanel { display: none; background: var(--bg); padding: 20px; animation: slideDown 0.3s ease-out; }
         .admin-visible #adminPanel { display: block; }
-        @keyframes slideDown { from {transform: translateY(-20px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+        @keyframes slideDown { from {transform: translateY(-30px); opacity:0;} to {transform: translateY(0); opacity:1;} }
         
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; font-family: inherit; }
-        textarea { resize: vertical; height: 80px; }
-        input:focus, textarea:focus { border-color: var(--primary); }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
-        .btn-sec { background: #777; }
+        .form-group { background: var(--card); border-radius: var(--radius-m); padding: 0 16px; margin-bottom: 20px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
-        .photo-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-photo { flex: 1; padding: 15px; border: 2px dashed #ccc; background: #fafafa; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: #555; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
-        .btn-photo:active { background: #e0f7fa; border-color: var(--primary); transform: scale(0.98); }
-        .btn-photo span { font-size: 1.5rem; }
-        .uploading-state { pointer-events: none; opacity: 0.6; background: #e0f7fa !important; border-color: var(--primary) !important; }
+        input, select, textarea { 
+            width: 100%; padding: 16px 0; border: none; border-bottom: 0.5px solid var(--separator); 
+            box-sizing: border-box; font-size: 17px; outline: none; font-family: inherit; background: transparent; color: var(--text);
+            -webkit-appearance: none;
+        }
+        input:last-child, select:last-child, textarea:last-child { border-bottom: none; }
+        textarea { resize: vertical; height: 100px; }
+        input::placeholder, textarea::placeholder { color: var(--text-secondary); }
+        
+        .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: var(--radius-m); font-weight: 600; cursor: pointer; font-size: 17px; margin-bottom: 12px; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-sec { background: rgba(142, 142, 147, 0.2); color: var(--text); }
+        .btn-danger { background: var(--accent); color: white; }
 
-        /* LOGIN */
-        .login-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 30px; border-radius: 15px; width: 80%; max-width: 300px; text-align: center; }
-        .link-btn { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 10px; font-size: 0.8rem; }
+        /* BOTONES FOTO IOS */
+        .photo-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .btn-photo { 
+            background: var(--card); border: none; border-radius: var(--radius-m); 
+            padding: 20px; cursor: pointer; font-size: 1rem; color: var(--primary); 
+            display: flex; flex-direction: column; align-items: center; gap: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .btn-photo:active { background: #E5E5EA; transform: scale(0.97); }
+        .btn-photo span { font-size: 2rem; }
+        .uploading-state { opacity: 0.5; pointer-events: none; }
 
-        /* GRILLA Y CATEGORIAS HORIZONTALES (Opcional mantenerlas) */
-        .cat-bar { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: var(--bg); border-bottom: 1px solid #eee; }
-        .cat-pill { background: white; padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; white-space: nowrap; cursor: pointer; }
-        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+        /* --- UI PRINCIPAL --- */
+        /* Categorías (Pills) */
+        .cat-bar { display: flex; overflow-x: auto; padding: 15px 15px 5px 15px; gap: 12px; background: var(--bg); -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-pill { 
+            background: rgba(142, 142, 147, 0.12); padding: 10px 20px; border-radius: 20px; 
+            font-weight: 600; color: var(--text); white-space: nowrap; cursor: pointer; transition: 0.2s; font-size: 0.95rem;
+        }
+        .cat-pill.active { background: var(--text); color: var(--card); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
+        /* Grilla Productos */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
+        .card { 
+            background: var(--card); border-radius: var(--radius-l); overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: relative; display: flex; flex-direction: column;
+            transition: transform 0.2s ease;
+        }
+        .card:active { transform: scale(0.97); }
         .card.no-stock { opacity: 0.6; }
         
-        .img-box { width: 100%; height: 160px; background: #eee; position: relative; }
+        .img-box { width: 100%; aspect-ratio: 1/1; background: #f0f0f0; position: relative; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .badge { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; }
+        .badge { position: absolute; top: 10px; left: 10px; padding: 6px 10px; border-radius: var(--radius-s); font-size: 0.7rem; font-weight: 800; color: white; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
         .bg-promo { background: var(--accent); }
-        .bg-stock { background: #333; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .bg-stock { background: rgba(0,0,0,0.7); top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.9rem; }
 
-        .card-actions { position: absolute; top: 5px; right: 5px; display: none; gap: 5px; z-index: 10; }
+        .card-actions { position: absolute; top: 10px; right: 10px; display: none; gap: 8px; z-index: 10; }
         .admin-visible .card-actions { display: flex; }
-        .act-btn { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: white; shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-del { background: #ff4444; color: white; }
+        .act-btn { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: var(--text); }
+        .btn-del { color: var(--accent); }
 
         .info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
-        .prices { margin-bottom: 5px; }
-        .old { text-decoration: line-through; color: #999; font-size: 0.85rem; margin-right: 5px; }
-        .curr { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+        .card-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; color: var(--text); line-height: 1.2; }
+        .desc-text { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .prices { margin-top: auto; padding-top: 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .old { text-decoration: line-through; color: var(--text-secondary); font-size: 0.9rem; }
+        .curr { color: var(--text); font-weight: 800; font-size: 1.2rem; }
         .promo { color: var(--accent); }
-        .desc-text { font-size: 0.8rem; color: #666; margin-bottom: 10px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .buy-btn { margin-top: auto; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
         
-        /* CARRITO FLOTANTE */
-        .cart-fab { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 12px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 500; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
-        .modal-body { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 80vh; overflow-y: auto; }
-        .cart-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .wa-btn { background: #25D366; color: white; text-align: center; padding: 15px; border-radius: 10px; display: block; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        .add-btn-floating {
+            position: absolute; bottom: 10px; right: 10px;
+            width: 32px; height: 32px; border-radius: 50%; background: var(--text); color: white;
+            border: none; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card.no-stock .add-btn-floating { background: var(--text-secondary); }
+
+        /* --- CARRITO FLOTANTE (Estilo Dock iOS) --- */
+        .cart-dock { 
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); 
+            background: rgba(25, 25, 25, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            color: white; padding: 16px 30px; border-radius: 40px; display: flex; align-items: center; gap: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); cursor: pointer; width: 85%; max-width: 400px; justify-content: space-between; z-index: 500; 
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .cart-dock:active { transform: translateX(-50%) scale(0.97); }
+        .cart-info { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.1rem; }
+        .cart-total { font-weight: 800; font-size: 1.3rem; }
+
+        /* --- MODALES (Bottom Sheet Style) --- */
+        .modal-overlay, .login-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2500; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+        .modal-body, .login-box { 
+            background: var(--card); width: 100%; max-width: 600px; 
+            border-radius: 24px 24px 0 0; padding: 30px 25px calc(30px + env(safe-area-inset-bottom)) 25px; 
+            max-height: 85vh; overflow-y: auto; box-shadow: 0 -5px 30px rgba(0,0,0,0.15);
+            animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-title { font-size: 1.6rem; font-weight: 800; margin: 0; }
+        .close-modal { background: #E5E5EA; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* Cart Rows */
+        .cart-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 0.5px solid var(--separator); padding-bottom: 15px; font-size: 1.1rem; }
+        .cart-row b { font-weight: 700; }
+        
+        /* Loader */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
     </style>
 </head>
 <body id="mainBody">
 
-    <div id="loader"><div class="spinner"></div><p id="loaderMsg" style="margin-top:20px; color:#666; font-size:0.9rem;">Cargando...</p></div>
+    <div id="loader"><div class="spinner"></div><p id="loaderMsg" style="margin-top:20px; color:var(--text-secondary); font-weight:600;">Iniciando...</p></div>
 
     <header>
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <button class="header-btn menu-icon" onclick="toggleMenu()">☰</button>
         <div class="brand">Mi Tienda</div>
-        <button class="admin-btn" onclick="checkLoginAccess()">🔒 Admin</button>
+        <button class="header-btn" onclick="checkLoginAccess()">Admin</button>
     </header>
 
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span>Categorías</span>
+            Menú
             <button class="close-menu" onclick="toggleMenu()">✕</button>
         </div>
-        <div class="sidebar-content" id="sidebarList">
-            </div>
+        <div class="sidebar-content">
+            <div class="sidebar-group" id="sidebarList">
+                </div>
+        </div>
         <div class="sidebar-footer">
-            <a href="#" class="contact-link wa" id="waContact" target="_blank">
-                <span>💬 WhatsApp</span>
-            </a>
-            <a href="#" class="contact-link ig" id="igContact" target="_blank">
-                <span>📷 Instagram</span>
-            </a>
+            <a href="#" class="contact-link wa" id="waContact" target="_blank">💬 WhatsApp</a>
+            <a href="#" class="contact-link ig" id="igContact" target="_blank">📷 Instagram</a>
         </div>
     </div>
 
     <div class="login-overlay" id="loginModal">
         <div class="login-box" id="loginFormBox">
-            <h3>Acceso Admin</h3>
-            <input type="text" id="loginUser" placeholder="Usuario">
-            <input type="password" id="loginPass" placeholder="Contraseña">
+            <div class="modal-header"><h3 class="modal-title">Acceso Admin</h3><button class="close-modal" onclick="closeLogin()">✕</button></div>
+            <div class="form-group">
+                <input type="text" id="loginUser" placeholder="Usuario">
+                <input type="password" id="loginPass" placeholder="Contraseña">
+            </div>
             <button class="btn-main" onclick="doLogin()">Entrar</button>
-            <button class="link-btn" onclick="closeLogin()">Cancelar</button>
         </div>
         <div class="login-box" id="changePassBox" style="display:none;">
-            <h3>Cambiar Clave</h3>
-            <input type="password" id="oldPass" placeholder="Clave Actual">
-            <input type="password" id="newPass" placeholder="Nueva Clave">
-            <input type="password" id="confirmPass" placeholder="Confirmar">
-            <button class="btn-main" onclick="saveNewPass()">Guardar</button>
-            <button class="link-btn" onclick="togglePassMode(false)">Volver</button>
+             <div class="modal-header"><h3 class="modal-title">Cambiar Clave</h3><button class="close-modal" onclick="togglePassMode(false)">✕</button></div>
+            <div class="form-group">
+                <input type="password" id="oldPass" placeholder="Clave Actual">
+                <input type="password" id="newPass" placeholder="Nueva Clave">
+                <input type="password" id="confirmPass" placeholder="Confirmar">
+            </div>
+            <button class="btn-main" onclick="saveNewPass()">Guardar Nueva Clave</button>
         </div>
     </div>
 
     <div id="adminPanel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 id="formTitle" style="margin:0;">Nuevo Producto</h3>
-            <button class="link-btn" onclick="togglePassMode(true)" style="margin:0;">Cambiar Clave</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; padding: 0 10px;">
+            <h2 id="formTitle" style="margin:0; font-size:1.8rem; font-weight:800;">Nuevo Producto</h2>
+            <button class="header-btn" onclick="togglePassMode(true)" style="font-size:1rem;">Clave</button>
         </div>
 
         <input type="hidden" id="editId">
-        <input type="text" id="pName" placeholder="Nombre del Producto">
-        <textarea id="pDesc" placeholder="Descripción del producto (Ingredientes, detalles, etc.)"></textarea>
         
-        <div class="form-row">
-            <input type="number" id="pPrice" placeholder="Precio ($)">
-            <input type="number" id="pPromo" placeholder="Promo (Opcional)">
+        <div class="form-group">
+            <input type="text" id="pName" placeholder="Nombre del Producto">
+            <textarea id="pDesc" placeholder="Descripción (Ingredientes, detalles...)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <div class="form-row">
+                <input type="number" id="pPrice" placeholder="Precio ($)">
+                <input type="number" id="pPromo" placeholder="Promo (Opcional)">
+            </div>
         </div>
 
         <div class="photo-buttons" id="uploadWrapper">
-            <button class="btn-photo" onclick="document.getElementById('fileInputCam').click()"><span>📸</span> Cámara</button>
-            <button class="btn-photo" onclick="document.getElementById('fileInputGal').click()"><span>📁</span> Galería</button>
+            <button class="btn-photo" onclick="document.getElementById('fileInputCam').click()"><span>📷</span> Cámara</button>
+            <button class="btn-photo" onclick="document.getElementById('fileInputGal').click()"><span>🖼️</span> Galería</button>
         </div>
-        <div id="uploadStatus" style="text-align:center; font-size:0.8rem; margin-bottom:10px; color:#666;">Selecciona una opción</div>
+        <div id="uploadStatus" style="text-align:center; font-size:0.9rem; margin-bottom:20px; color:var(--text-secondary);">Toca para subir foto</div>
 
         <input type="file" id="fileInputCam" accept="image/*" capture="environment" onchange="uploadToDrive(this)" style="display:none;">
         <input type="file" id="fileInputGal" accept="image/*" onchange="uploadToDrive(this)" style="display:none;">
-        
-        <input type="text" id="pImg" placeholder="Link de imagen..." style="font-size:12px; color:#666; background:#eee;" readonly>
+        <input type="hidden" id="pImg">
 
-        <div class="form-row">
-            <input type="text" id="pCat" placeholder="Categoría" list="catDatalist">
-            <select id="pStock"><option value="SI">Hay Stock</option><option value="NO">Sin Stock</option></select>
+        <div class="form-group">
+            <input type="text" id="pCat" placeholder="Categoría (Ej: Remeras)" list="catDatalist">
+            <select id="pStock" style="color:var(--primary); font-weight:600;"><option value="SI">✅ Hay Stock</option><option value="NO">❌ Sin Stock</option></select>
         </div>
         <datalist id="catDatalist"></datalist>
 
-        <button class="btn-main" onclick="saveProductToServer()" id="btnSave">Guardar Producto</button>
+        <button class="btn-main" onclick="saveProductToServer()" id="btnSave" style="margin-top:20px;">Guardar Producto</button>
         <button class="btn-main btn-sec" onclick="cancelEdit()" id="btnCancel" style="display:none">Cancelar Edición</button>
-        <button class="btn-main btn-sec" onclick="logout()" style="background:#333; margin-top:10px;">Cerrar Sesión</button>
+        <button class="btn-main btn-danger" onclick="logout()" style="margin-top:20px;">Cerrar Sesión</button>
     </div>
 
     <div class="cat-bar" id="catContainer"></div>
     <div class="grid" id="grid"></div>
 
-    <div class="cart-fab" id="cartBtn" onclick="openCart()" style="display:none;">
-        <span>🛒 <b id="cartCount">0</b></span> <b id="cartTotal">$0</b>
+    <div class="cart-dock" id="cartBtn" onclick="openCart()" style="display:none;">
+        <div class="cart-info"><span>🛍️</span> <span id="cartCount">0</span> items</div>
+        <div class="cart-total" id="cartTotal">$0</div>
     </div>
+
     <div class="modal-overlay" id="cartModal" onclick="if(event.target===this)closeCart()">
         <div class="modal-body">
-            <div style="display:flex; justify-content:space-between;"><h2>Pedido</h2><span onclick="closeCart()" style="cursor:pointer; font-size:1.5rem;">✕</span></div>
+            <div class="modal-header"><h2 class="modal-title">Tu Pedido</h2><button class="close-modal" onclick="closeCart()">✕</button></div>
             <div id="cartList"></div>
-            <h3>Total: <span id="modalTotal">$0</span></h3>
-            <a href="#" id="waLink" class="wa-btn" target="_blank">Enviar Pedido por WhatsApp</a>
-            <p onclick="clearCart()" style="text-align:center; margin-top:15px; text-decoration:underline; cursor:pointer; color:#999;">Vaciar Carrito</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; margin-bottom:20px;">
+                 <span style="font-size:1.3rem; color:var(--text-secondary);">Total a pagar:</span>
+                 <span id="modalTotal" style="font-size:2rem; font-weight:800;">$0</span>
+            </div>
+            <a href="#" id="waLink" class="btn-main wa-btn" target="_blank" style="text-decoration:none; display:flex; justify-content:center; align-items:center; background:#25D366;">Enviar Pedido por WhatsApp</a>
+            <button onclick="clearCart()" class="btn-main btn-sec" style="background:transparent; color:var(--text-secondary); margin-top:10px;">Vaciar Carrito</button>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxMUSMKycILcGWQVbUbAy7MtgvvvWhM0-QdlMdp4sXxirDHKz-LvaQgaYuku3Td8puS4Q/exec";
         const PHONE = "5491138614767"; 
-        
-        // ============================================
-        //  👇 PON TU INSTAGRAM AQUI 👇
-        const INSTAGRAM_URL = "https://instagram.com/TU_USUARIO_AQUI"; 
-        // ============================================
+        const INSTAGRAM_URL = "https://instagram.com/"; // PON TU IG AQUI
 
         let products = [], cart = [], activeCat = 'all';
         let isLoggedIn = false;
@@ -221,8 +326,10 @@
 
         // LOGIN
         function checkLoginAccess() { 
-            if (isLoggedIn) document.getElementById('mainBody').classList.toggle('admin-visible');
-            else {
+            if (isLoggedIn) {
+                document.getElementById('mainBody').classList.toggle('admin-visible');
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
                 document.getElementById('loginModal').style.display='flex';
                 document.getElementById('loginFormBox').style.display='block';
                 document.getElementById('changePassBox').style.display='none';
@@ -230,7 +337,7 @@
         }
         function doLogin() {
             const u = document.getElementById('loginUser').value, p = document.getElementById('loginPass').value, c = getCreds();
-            if (u === c.u && p === c.p) { isLoggedIn = true; closeLogin(); document.getElementById('mainBody').classList.add('admin-visible'); } else alert("Datos incorrectos");
+            if (u === c.u && p === c.p) { isLoggedIn = true; closeLogin(); document.getElementById('mainBody').classList.add('admin-visible'); window.scrollTo(0,0); } else alert("Datos incorrectos");
         }
         function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
         function logout() { isLoggedIn = false; document.getElementById('mainBody').classList.remove('admin-visible'); alert("Sesión cerrada"); }
@@ -245,7 +352,7 @@
         function uploadToDrive(inputElement) {
             const file = inputElement.files[0]; const status = document.getElementById('uploadStatus'); const btns = document.querySelectorAll('.btn-photo');
             if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("Máximo 5MB.");
-            status.innerText = "⏳ Subiendo..."; status.style.fontWeight = "bold"; status.style.color = "var(--primary)";
+            status.innerText = "Subiendo..."; status.style.fontWeight = "600"; status.style.color = "var(--primary)";
             btns.forEach(b => b.classList.add('uploading-state'));
 
             const reader = new FileReader(); reader.readAsDataURL(file);
@@ -254,14 +361,14 @@
                 try {
                     const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "uploadImage", image: base64Content, mimeType: file.type, filename: file.name }) });
                     const data = await res.json();
-                    if(data.result === "success") { document.getElementById('pImg').value = data.url; status.innerText = "✅ Foto guardada"; status.style.color = "green"; } else throw new Error(data.message);
-                } catch(e) { status.innerText = "❌ Error"; status.style.color = "red"; alert("Error: " + e); } finally { btns.forEach(b => b.classList.remove('uploading-state')); }
+                    if(data.result === "success") { document.getElementById('pImg').value = data.url; status.innerText = "✅ Foto lista"; status.style.color = "#34C759"; } else throw new Error(data.message);
+                } catch(e) { status.innerText = "❌ Error"; status.style.color = "var(--accent)"; alert("Error: " + e); } finally { btns.forEach(b => b.classList.remove('uploading-state')); }
             };
         }
 
         // LOGICA TIENDA
         async function init() {
-            showLoader(true, "Conectando...");
+            showLoader(true);
             document.getElementById('waContact').href = `https://wa.me/${PHONE}`;
             document.getElementById('igContact').href = INSTAGRAM_URL;
             try {
@@ -285,7 +392,7 @@
                 stock: document.getElementById('pStock').value, desc: document.getElementById('pDesc').value 
             };
             showLoader(true, "Guardando...");
-            try { await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }); cancelEdit(); await init(); alert("Guardado!"); } catch (err) { alert("Error al guardar"); } finally { showLoader(false); }
+            try { await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }); cancelEdit(); await init(); } catch (err) { alert("Error al guardar"); } finally { showLoader(false); }
         }
 
         async function deleteProduct(id) {
@@ -303,11 +410,8 @@
             cats.forEach(x => { 
                 const isActive = activeCat === x;
                 const cls = isActive ? 'active' : '';
-                // Horizontal
                 c.innerHTML += `<div class="cat-pill ${cls}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`;
-                // Sidebar
                 sb.innerHTML += `<div class="sidebar-item ${cls}" onclick="filter('${x==='Todos'?'all':x}'); toggleMenu()">${x}</div>`;
-                
                 if(x!=='Todos') dl.innerHTML += `<option value="${x}">`; 
             });
         }
@@ -317,14 +421,17 @@
         function renderGrid(c) {
             const g = document.getElementById('grid'); g.innerHTML = '';
             const list = c === 'all' ? products : products.filter(p => p.cat === c);
-            if(list.length === 0) { g.innerHTML = '<p style="text-align:center;width:100%;color:#888;">Vacío</p>'; return; }
+            if(list.length === 0) { g.innerHTML = '<p style="text-align:center;width:100%;color:var(--text-secondary);grid-column:1/-1;padding:40px;">No hay productos aquí.</p>'; return; }
             list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
                 g.innerHTML += `
                 <div class="card ${!p.hasStock?'no-stock':''}">
                     <div class="card-actions"><button class="act-btn" onclick='editP(${JSON.stringify(p)})'>✏️</button><button class="act-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button></div>
                     <div class="img-box">${isPromo?'<span class="badge bg-promo">OFERTA</span>':''}${!p.hasStock?'<span class="badge bg-stock">AGOTADO</span>':''}<img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Error'"></div>
-                    <div class="info"><div style="font-weight:bold; margin-bottom:5px;">${p.name}</div>${p.desc ? `<div class="desc-text">${p.desc}</div>` : ''}<div class="prices">${isPromo ? `<span class="old">$${p.price}</span> <span class="curr promo">$${p.promoPrice}</span>` : `<span class="curr">$${p.price}</span>`}</div><button class="buy-btn" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'AGREGAR':'SIN STOCK'}</button></div>
+                    <div class="info"><div class="card-title">${p.name}</div>${p.desc ? `<div class="desc-text">${p.desc}</div>` : ''}
+                    <div class="prices">${isPromo ? `<span class="old">$${p.price}</span> <span class="curr promo">$${p.promoPrice}</span>` : `<span class="curr">$${p.price}</span>`}</div>
+                    <button class="add-btn-floating" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'+':'✕'}</button>
+                    </div>
                 </div>`;
             });
         }
@@ -334,16 +441,16 @@
             document.getElementById('editId').value = p.id;
             document.getElementById('pName').value = p.name; document.getElementById('pPrice').value = p.price; document.getElementById('pPromo').value = p.promoPrice||'';
             document.getElementById('pImg').value = p.img; document.getElementById('pCat').value = p.cat; document.getElementById('pStock').value = p.hasStock?'SI':'NO'; document.getElementById('pDesc').value = p.desc || ''; 
-            document.getElementById('uploadStatus').innerText = "✅ Foto OK en Drive"; document.getElementById('uploadStatus').style.color = "green";
-            document.getElementById('btnSave').innerText = "Actualizar"; document.getElementById('btnCancel').style.display = 'block'; document.getElementById('formTitle').innerText = "Editar";
-            window.scrollTo(0,0);
+            document.getElementById('uploadStatus').innerText = "✅ Foto actual OK"; document.getElementById('uploadStatus').style.color = "#34C759";
+            document.getElementById('btnSave').innerText = "Actualizar Producto"; document.getElementById('btnCancel').style.display = 'block'; document.getElementById('formTitle').innerText = "Editar Producto";
+            document.getElementById('mainBody').classList.add('admin-visible'); window.scrollTo(0,0);
         }
         
         function cancelEdit() {
             document.getElementById('editId').value = ''; document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pPromo').value = '';
             document.getElementById('pImg').value = ''; document.getElementById('pDesc').value = ''; document.getElementById('fileInputCam').value = ""; document.getElementById('fileInputGal').value = "";
-            document.getElementById('uploadStatus').innerText = "Selecciona una opción"; document.getElementById('uploadStatus').style.color = "#666";
-            document.getElementById('btnSave').innerText = "Guardar"; document.getElementById('btnCancel').style.display = 'none'; document.getElementById('formTitle').innerText = "Nuevo";
+            document.getElementById('uploadStatus').innerText = "Toca para subir foto"; document.getElementById('uploadStatus').style.color = "var(--text-secondary)";
+            document.getElementById('btnSave').innerText = "Guardar Producto"; document.getElementById('btnCancel').style.display = 'none'; document.getElementById('formTitle').innerText = "Nuevo Producto";
         }
         
         function addCart(id) { const p = products.find(x=>x.id==id); if(p&&p.hasStock){ cart.push(p); updateCart(); } }
