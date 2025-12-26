@@ -22,7 +22,7 @@
         .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--primary); }
         .btn-text { background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--primary); cursor: pointer; }
 
-        /* SIDEBAR Y BOTONES SOCIALES (CON RELLENO) */
+        /* SIDEBAR */
         .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: white; z-index: 2000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar.open { left: 0; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1999; display:none; opacity:0; transition:0.3s; }
@@ -31,9 +31,8 @@
         .sidebar-body { flex:1; overflow-y:auto; padding:10px; }
         .sidebar-item { padding:15px; border-radius:10px; margin-bottom:5px; cursor:pointer; color:#333; transition:0.2s; font-weight: 500; }
         .sidebar-item:hover, .sidebar-item.active { background: #f0f7ff; color: var(--primary); }
-        
         .sidebar-foot { padding:20px; border-top:1px solid #eee; }
-        /* BOTONES SOCIALES SOLIDOS */
+        
         .contact-btn { display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; margin-bottom: 12px; padding: 15px; border-radius: 12px; font-weight: 700; transition: 0.2s; border:none; }
         .contact-btn.wa { background: #25D366; } 
         .contact-btn.ig { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); }
@@ -65,7 +64,6 @@
         .card { background: white; border-radius: var(--radius); overflow: hidden; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; }
         @media (min-width: 1024px) { .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); } }
         .card.no-stock { opacity: 0.6; filter: grayscale(0.5); }
-        
         .highlight-card { animation: flashHighlight 1.5s ease-in-out 2; z-index: 10; }
         @keyframes flashHighlight { 0%, 100% {box-shadow: 0 4px 15px rgba(0,0,0,0.05);} 50% {box-shadow: 0 0 0 4px var(--primary), 0 15px 40px rgba(0,122,255,0.4); transform: scale(1.02);} }
 
@@ -74,22 +72,12 @@
         .badge { position: absolute; top: 12px; left: 12px; padding: 6px 10px; border-radius: 6px; color: white; font-size: 0.75rem; font-weight: 800; backdrop-filter: blur(4px); }
         .bg-promo { background: var(--accent); } .bg-stock { background: rgba(0,0,0,0.7); top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 1.1rem; }
 
-        /* BOTÓN COMPARTIR SUTIL */
-        .btn-share {
-            position: absolute; top: 10px; right: 10px;
-            width: 35px; height: 35px; border-radius: 50%;
-            background: rgba(255,255,255,0.5); border: none; 
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; color: #333; z-index: 5;
-            transition: 0.2s;
-        }
+        .btn-share { position: absolute; top: 10px; right: 10px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.5); border: none; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; color: #333; z-index: 5; transition: 0.2s; }
         .btn-share:hover { background: rgba(255,255,255,0.9); }
 
         .card-info { padding: 15px; display:flex; flex-direction:column; flex-grow:1; }
         .c-title { font-weight: 700; margin-bottom: 6px; color: var(--text); font-size: 1.1rem; }
         .c-desc { font-size: 0.9rem; color: var(--text-sec); margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        
         .variants-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .var-pill { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: #666; cursor: pointer; transition: 0.2s; }
         .var-pill.selected { background: var(--primary); color: white; border-color: var(--primary); }
@@ -98,23 +86,26 @@
         .c-price { font-weight: 800; font-size: 1.3rem; }
         .old-p { text-decoration: line-through; color: var(--text-sec); font-size: 0.9rem; margin-right: 6px; }
         
-        /* BOTÓN AGREGAR CON CONTADOR */
-        .btn-add { 
-            width: auto; min-width: 40px; height: 40px; border-radius: 20px; padding: 0 10px;
-            background: var(--primary); color: white; border: none; 
-            font-size: 1.2rem; font-weight: 700; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            transition: 0.2s; box-shadow: 0 4px 10px rgba(0,122,255,0.3); 
+        /* BOTÓN AGREGAR SIMPLE (+) */
+        .btn-add { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,122,255,0.3); }
+        .btn-add:active { transform: scale(0.9); } .card.no-stock .btn-add { background: #ccc; box-shadow: none; pointer-events: none; }
+
+        /* CONTROL DE CANTIDAD (LA PASTILLA - +) */
+        .qty-selector { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: var(--primary); border-radius: 20px; height: 40px; 
+            padding: 0 5px; box-shadow: 0 4px 10px rgba(0,122,255,0.3); min-width: 90px;
         }
-        .btn-add:active { transform: scale(0.9); } 
-        .card.no-stock .btn-add { background: #ccc; box-shadow: none; pointer-events: none; }
-        .qty-badge { font-size: 1rem; margin-left: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; }
+        .btn-qty { 
+            width: 30px; height: 100%; border: none; background: transparent; 
+            color: white; font-size: 1.2rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .qty-num { color: white; font-weight: 700; font-size: 1rem; margin: 0 5px; min-width: 20px; text-align: center; }
 
         .card-actions { position: absolute; top:10px; right:50px; display:none; gap:8px; z-index: 20; }
         .admin-visible .card-actions { display:flex; }
         .act-btn { width:36px; height:36px; border-radius:50%; background:white; border:none; box-shadow:0 4px 10px rgba(0,0,0,0.1); cursor:pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
 
-        /* MODALES ETC */
         .dock { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1c1c1e; color: white; padding: 15px 30px; border-radius: 40px; display: flex; align-items: center; gap: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); cursor: pointer; z-index: 500; transition: 0.3s; width: auto; min-width: 280px; justify-content: space-between; }
         .dock:hover { transform: translateX(-50%) scale(1.05); }
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
@@ -148,12 +139,8 @@
             <div class="sidebar-head">Menú <button class="btn-icon" onclick="toggleMenu()">✕</button></div>
             <div class="sidebar-body" id="sidebarList"></div>
             <div class="sidebar-foot">
-                <a href="#" id="waContact" target="_blank" class="contact-btn wa">
-                    <span>💬</span> WhatsApp
-                </a>
-                <a href="#" id="igContact" target="_blank" class="contact-btn ig">
-                    <span>📷</span> Instagram
-                </a>
+                <a href="#" id="waContact" target="_blank" class="contact-btn wa"><span>💬</span> WhatsApp</a>
+                <a href="#" id="igContact" target="_blank" class="contact-btn ig"><span>📷</span> Instagram</a>
             </div>
         </div>
 
@@ -354,7 +341,6 @@
         
         function filter(c) { activeCat=c; renderCats(); renderGrid(c); }
         
-        // --- LOGICA DE CANTIDAD EN CARRITO ---
         function getQty(id) {
             return cart.filter(i => i.id == id).length;
         }
@@ -375,6 +361,25 @@
                     variantsHtml += '</div>';
                 }
 
+                // Lógica de botones: Si la cantidad es > 0, mostramos control +/- (solo si no tiene variantes o para simplificar)
+                // Para mantenerlo simple con variantes: Si tiene variantes, siempre muestra "+".
+                // Si NO tiene variantes y qty > 0, muestra el control +/-.
+                
+                let buttonHtml = '';
+                if (qty > 0 && !p.vars) {
+                    buttonHtml = `
+                    <div class="qty-selector">
+                        <button class="btn-qty" onclick="minusCart(${p.id})">−</button>
+                        <span class="qty-num">${qty}</span>
+                        <button class="btn-qty" onclick="addCart(${p.id})">+</button>
+                    </div>`;
+                } else {
+                    buttonHtml = `
+                    <button class="btn-add" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>
+                        ${p.hasStock ? '+' : '✕'}
+                    </button>`;
+                }
+
                 g.innerHTML += `
                 <div class="card ${!p.hasStock?'no-stock':''}" id="product-${p.id}">
                     <button class="btn-share" onclick="shareProduct(${p.id})">🔗</button>
@@ -386,10 +391,7 @@
                         ${variantsHtml}
                         <div class="c-footer">
                             <div class="prices">${isPromo ? `<span class="old-p">$${p.price}</span> <span class="promo">$${p.promoPrice}</span>` : `$${p.price}`}</div>
-                            <button class="btn-add" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>
-                                ${p.hasStock ? '+' : '✕'}
-                                ${qty > 0 ? `<span class="qty-badge">${qty}</span>` : ''}
-                            </button>
+                            ${buttonHtml}
                         </div>
                     </div>
                 </div>`;
@@ -432,8 +434,20 @@
                 }
                 cart.push(cartItem); 
                 updateCart(); 
-                renderGrid(activeCat); // Re-render para actualizar el contador en el botón
+                renderGrid(activeCat); 
             } 
+        }
+
+        function minusCart(id) {
+            // Buscar el último índice de este producto en el carrito
+            // Nota: Si hay variantes, esto podría borrar cualquiera. 
+            // Para simplificar, asumimos que minusCart solo aparece si NO hay variantes (según renderGrid).
+            const index = cart.map(i => i.id).lastIndexOf(id);
+            if (index > -1) {
+                cart.splice(index, 1);
+                updateCart();
+                renderGrid(activeCat);
+            }
         }
 
         function updateCart() {
