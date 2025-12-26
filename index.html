@@ -3,17 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Tienda Online</title>
+    <title>Catálogo Digital</title>
     <style>
-        :root {
-            --primary: #008069;
-            --accent: #e53935; /* Rojo para ofertas */
-            --bg: #f0f2f5;
-            --card: #ffffff;
-            --text: #333;
-        }
-
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+        :root { --primary: #008069; --accent: #e53935; --bg: #f0f2f5; --card: #ffffff; --text: #333; }
+        body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
         
         /* HEADER */
         header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -21,75 +14,58 @@
         .admin-toggle { font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 20px; cursor: pointer; border: none; color: white; }
 
         /* ADMIN PANEL */
-        #adminPanel { display: none; background: #fff; padding: 20px; border-bottom: 2px solid #ddd; animation: slideDown 0.3s; }
+        #adminPanel { display: none; background: #fff; padding: 20px; border-bottom: 2px solid #ddd; }
         .admin-visible #adminPanel { display: block; }
-        @keyframes slideDown { from {opacity:0; transform: translateY(-10px);} to {opacity:1; transform: translateY(0);} }
-
+        
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .full-width { grid-column: span 2; }
-        
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #eee; padding: 10px; border-radius: 8px; }
-        .checkbox-wrapper input { width: auto; margin: 0; }
-        
-        .btn-save { background: #333; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; }
-        .btn-cancel { background: #999; margin-top: 5px; }
+        .btn-save { background: #333; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
+        .btn-cancel { background: #999; }
+        .btn-export { background: #0056b3; margin-top: 15px; }
+
+        /* EXPORT BOX */
+        #exportBox { display: none; margin-top: 15px; background: #eef; padding: 15px; border-radius: 8px; border: 1px solid #ccd; }
+        #exportText { width: 100%; height: 80px; font-size: 10px; color: #555; }
 
         /* CATEGORÍAS */
-        .cat-scroll { display: flex; overflow-x: auto; padding: 15px 10px; gap: 10px; background: var(--bg); white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .cat-btn { padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #ddd; cursor: pointer; font-size: 0.9rem; color: #555; transition: 0.2s; }
-        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; box-shadow: 0 2px 5px rgba(0,128,105,0.3); }
+        .cat-scroll { display: flex; overflow-x: auto; padding: 15px 10px; gap: 10px; background: var(--bg); white-space: nowrap; }
+        .cat-btn { padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #ddd; cursor: pointer; transition: 0.2s; }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
 
-        /* GRILLA PRODUCTOS */
+        /* GRILLA */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
-        
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
-        
-        /* Estado Agotado */
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative; display: flex; flex-direction: column; }
         .card.no-stock { opacity: 0.6; filter: grayscale(100%); pointer-events: none; }
-        .card.no-stock .admin-actions { pointer-events: auto; filter: grayscale(0%); } /* Permitir editar aunque no haya stock */
-
+        .card.no-stock .admin-actions { pointer-events: auto; filter: grayscale(0%); }
+        
         .card-img-container { position: relative; width: 100%; height: 160px; }
         .card-img { width: 100%; height: 100%; object-fit: cover; background: #eee; }
-        
-        /* Badges */
-        .badge { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; color: white; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .badge { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; color: white; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
         .badge-promo { background: var(--accent); }
         .badge-stock { background: #555; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; padding: 10px 20px; border-radius: 8px; z-index: 10; }
 
-        /* Botones Admin en tarjeta */
-        .admin-actions { position: absolute; top: 5px; right: 5px; display: none; z-index: 20; }
-        .admin-visible .admin-actions { display: flex; gap: 5px; }
+        .admin-actions { position: absolute; top: 5px; right: 5px; display: none; z-index: 20; gap: 5px; }
+        .admin-visible .admin-actions { display: flex; }
         .action-btn { width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-edit { background: white; color: #333; }
-        .btn-del { background: #ff4444; color: white; }
+        .btn-edit { background: white; } .btn-del { background: #ff4444; color: white; }
 
-        .card-body { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-title { font-weight: 600; margin: 0 0 5px 0; font-size: 0.95rem; line-height: 1.3; }
-        
+        .card-body { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-title { font-weight: 600; margin: 0 0 5px 0; font-size: 0.95rem; }
         .price-container { margin-bottom: 10px; }
-        .price-old { text-decoration: line-through; color: #999; font-size: 0.85rem; margin-right: 5px; }
+        .price-old { text-decoration: line-through; color: #999; font-size: 0.8rem; margin-right: 5px; }
         .price-curr { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
         .price-promo { color: var(--accent); }
-
-        .add-btn { background: var(--primary); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; margin-top: auto; cursor: pointer; font-weight: 500; transition: background 0.2s; }
+        
+        .add-btn { background: var(--primary); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; margin-top: auto; cursor: pointer; font-weight: 500; }
         .add-btn:active { transform: scale(0.98); }
 
-        /* CARRITO FLOTANTE */
+        /* CARRITO */
         .cart-float { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 15px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 200; transition: transform 0.2s; }
-        .cart-float:active { transform: translateX(-50%) scale(0.95); }
-        
-        /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; justify-content: center; align-items: flex-end; backdrop-filter: blur(2px); }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); animation: slideUp 0.3s; }
-        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
-
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .cart-item-info { display: flex; flex-direction: column; }
-        .cart-item-title { font-weight: bold; font-size: 0.9rem; }
-        .cart-item-price { color: #666; font-size: 0.85rem; }
-        .btn-whatsapp { background: #25D366; color: white; text-align: center; padding: 15px; border-radius: 12px; display: block; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
-
+        .btn-whatsapp { background: #25D366; color: white; text-align: center; padding: 15px; border-radius: 12px; display: block; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 1.1rem; }
     </style>
 </head>
 <body id="appBody">
@@ -101,93 +77,168 @@
 
     <div id="adminPanel">
         <h3 id="formTitle">Agregar Producto</h3>
-        <input type="hidden" id="editId"> <input type="text" id="prodName" placeholder="Nombre del producto">
-        
+        <input type="hidden" id="editId">
+        <input type="text" id="prodName" placeholder="Nombre del producto">
         <div class="form-grid">
             <input type="number" id="prodPrice" placeholder="Precio ($)">
             <input type="number" id="prodPromo" placeholder="Precio Promo (Opcional)">
         </div>
-
         <input type="text" id="prodImg" placeholder="URL Imagen (https://...)">
-        
         <div class="form-grid">
             <input type="text" id="prodCat" placeholder="Categoría" list="catList">
             <div class="checkbox-wrapper">
-                <input type="checkbox" id="prodStock" checked>
-                <label for="prodStock">¿Hay Stock?</label>
+                <input type="checkbox" id="prodStock" checked> <label for="prodStock">¿Hay Stock?</label>
             </div>
         </div>
-        
         <datalist id="catList"></datalist>
 
         <button class="btn-save" onclick="saveProduct()" id="btnSave">Guardar Producto</button>
-        <button class="btn-save btn-cancel" onclick="resetForm()" id="btnCancel" style="display:none">Cancelar Edición</button>
+        <button class="btn-save btn-cancel" onclick="resetForm()" id="btnCancel" style="display:none">Cancelar</button>
         
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-        
-        <h3>Configuración Tienda</h3>
+        <hr>
+        <h3>Configuración</h3>
         <input type="text" id="configStoreName" placeholder="Nombre del Negocio">
         <input type="text" id="configPhone" placeholder="WhatsApp (Ej: 5491122334455)">
-        <button class="btn-save" onclick="saveConfig()">Actualizar Datos</button>
+        <button class="btn-save" onclick="saveConfig()">Guardar Configuración</button>
+
+        <hr>
+        <button class="btn-save btn-export" onclick="exportData()">📤 OBTENER CÓDIGO PARA COMPARTIR</button>
+        <div id="exportBox">
+            <p style="margin-top:0; font-size:12px; font-weight:bold; color:var(--primary);">1. Copia este texto.<br>2. Abre este archivo HTML con el Bloc de Notas.<br>3. Pégalo donde dice "PEGAR AQUI".</p>
+            <textarea id="exportText" readonly></textarea>
+            <button class="btn-save" onclick="copyToClipboard()" style="margin-top:5px; background:#444;">Copiar Texto</button>
+        </div>
     </div>
 
     <div class="cat-scroll" id="catContainer"></div>
-
     <div class="grid" id="productGrid"></div>
 
     <div class="cart-float" onclick="openCart()" id="cartBtn" style="display: none;">
-        <span style="display:flex; align-items:center; gap:10px;">
-            🛒 <span id="cartCount" style="background:white; color:black; padding:2px 8px; border-radius:10px; font-size:0.8rem; font-weight:bold;">0</span>
-        </span>
-        <b id="cartTotal">$0</b>
+        <span>🛒 <span id="cartCount">0</span></span> <b id="cartTotal">$0</b>
     </div>
 
     <div class="modal" id="cartModal" onclick="if(event.target === this) closeCart()">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0">Tu Pedido</h2>
-                <button onclick="closeCart()" style="background:none; border:none; font-size:1.5rem;">✕</button>
-            </div>
-            
+            <div style="display:flex; justify-content:space-between;"><h2>Tu Pedido</h2><span onclick="closeCart()" style="font-size:1.5rem;cursor:pointer;">✕</span></div>
             <div id="cartItemsList"></div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; font-size:1.2rem; font-weight:bold;">
-                <span>Total:</span>
-                <span id="modalTotal">$0</span>
-            </div>
-            
-            <a href="#" id="waLink" class="btn-whatsapp" target="_blank">Enviar Pedido por WhatsApp</a>
-            <button onclick="clearCart()" style="width:100%; margin-top:10px; border:none; background:none; color:#999; text-decoration:underline; cursor:pointer;">Vaciar Carrito</button>
+            <h3>Total: <span id="modalTotal">$0</span></h3>
+            <a href="#" id="waLink" class="btn-whatsapp" target="_blank">Enviar Pedido</a>
+            <button onclick="clearCart()" style="width:100%; margin-top:10px; border:none; background:none; color:#999; text-decoration:underline;">Vaciar Carrito</button>
         </div>
     </div>
 
     <script>
-        // --- ESTADO INICIAL ---
-        let products = JSON.parse(localStorage.getItem('shopProducts_v2')) || [];
-        let config = JSON.parse(localStorage.getItem('shopConfig_v2')) || { name: "Mi Tienda", phone: "" };
-        let cart = [];
-        let activeCategory = 'all';
+        // ==========================================
+        //  👇👇👇 ZONA DE DATOS COMPARTIDOS 👇👇👇
+        //  Pega el código generado entre las comillas:
+        const DATOS_COMPARTIDOS = null; 
+        // ==========================================
 
-        // --- INICIALIZACIÓN ---
+        let products = [], config = { name: "Mi Tienda", phone: "" }, cart = [], activeCategory = 'all';
+
         function init() {
+            // Lógica inteligente: Si hay datos compartidos (hardcoded), úsalos. Si no, usa localStorage (modo creador).
+            if (DATOS_COMPARTIDOS) {
+                products = DATOS_COMPARTIDOS.products;
+                config = DATOS_COMPARTIDOS.config;
+                // Ocultar admin para el cliente final (opcional)
+                // document.querySelector('.admin-toggle').style.display = 'none';
+            } else {
+                products = JSON.parse(localStorage.getItem('shopProducts_v3')) || [];
+                config = JSON.parse(localStorage.getItem('shopConfig_v3')) || { name: "Mi Tienda", phone: "" };
+            }
+
             document.getElementById('storeTitle').innerText = config.name;
             document.getElementById('configStoreName').value = config.name;
             document.getElementById('configPhone').value = config.phone;
             renderCategories();
-            renderProducts(activeCategory);
+            renderProducts('all');
         }
 
-        // --- FUNCIONES CORE ---
-        function toggleAdmin() {
-            document.getElementById('appBody').classList.toggle('admin-visible');
+        /* --- EXPORTAR --- */
+        function exportData() {
+            const data = { products, config };
+            const json = JSON.stringify(data);
+            
+            document.getElementById('exportBox').style.display = 'block';
+            document.getElementById('exportText').value = json;
+        }
+
+        function copyToClipboard() {
+            const copyText = document.getElementById("exportText");
+            copyText.select();
+            document.execCommand("copy");
+            alert("¡Código copiado! Ahora abre este archivo con el Bloc de Notas y pégalo donde dice 'const DATOS_COMPARTIDOS = null', reemplazando el 'null'.");
+        }
+
+        /* --- CORE --- */
+        function toggleAdmin() { document.getElementById('appBody').classList.toggle('admin-visible'); }
+        
+        function saveData() {
+            // Solo guardamos en localStorage si NO estamos en modo compartido
+            if (!DATOS_COMPARTIDOS) {
+                localStorage.setItem('shopProducts_v3', JSON.stringify(products));
+                localStorage.setItem('shopConfig_v3', JSON.stringify(config));
+            } else {
+                alert("Estás en modo 'Cliente'. Los cambios no se guardarán permanentemente porque estás usando un archivo compartido.");
+            }
         }
 
         function saveConfig() {
             config.name = document.getElementById('configStoreName').value;
             config.phone = document.getElementById('configPhone').value;
-            localStorage.setItem('shopConfig_v2', JSON.stringify(config));
-            alert("Datos actualizados");
-            location.reload();
+            saveData();
+            document.getElementById('storeTitle').innerText = config.name;
+            alert("Configuración local guardada. Recuerda EXPORTAR si quieres compartirla.");
+        }
+
+        function saveProduct() {
+            const idInput = document.getElementById('editId').value;
+            const name = document.getElementById('prodName').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const promo = document.getElementById('prodPromo').value ? parseFloat(document.getElementById('prodPromo').value) : null;
+            const img = document.getElementById('prodImg').value || "https://via.placeholder.com/150";
+            const cat = document.getElementById('prodCat').value || "General";
+            const hasStock = document.getElementById('prodStock').checked;
+
+            if (!name || isNaN(price)) return alert("Falta nombre o precio");
+
+            if (idInput) {
+                const idx = products.findIndex(p => p.id == idInput);
+                if (idx !== -1) products[idx] = { ...products[idx], name, price, promoPrice: promo, img, cat, hasStock };
+            } else {
+                products.push({ id: Date.now(), name, price, promoPrice: promo, img, cat, hasStock });
+            }
+            
+            saveData();
+            resetForm();
+            renderCategories();
+            renderProducts(activeCategory);
+        }
+
+        function deleteProduct(id) {
+            if(!confirm("¿Borrar?")) return;
+            products = products.filter(p => p.id !== id);
+            saveData();
+            renderProducts(activeCategory);
+            renderCategories();
+        }
+
+        function editProduct(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            if(!document.getElementById('appBody').classList.contains('admin-visible')) toggleAdmin();
+            document.getElementById('editId').value = p.id;
+            document.getElementById('prodName').value = p.name;
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodPromo').value = p.promoPrice || '';
+            document.getElementById('prodImg').value = p.img;
+            document.getElementById('prodCat').value = p.cat;
+            document.getElementById('prodStock').checked = p.hasStock;
+            document.getElementById('formTitle').innerText = "Editar Producto";
+            document.getElementById('btnSave').innerText = "Actualizar";
+            document.getElementById('btnCancel').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetForm() {
@@ -196,247 +247,88 @@
             document.getElementById('prodPrice').value = '';
             document.getElementById('prodPromo').value = '';
             document.getElementById('prodImg').value = '';
-            document.getElementById('prodCat').value = '';
             document.getElementById('prodStock').checked = true;
-
             document.getElementById('formTitle').innerText = "Agregar Producto";
-            document.getElementById('btnSave').innerText = "Guardar Producto";
+            document.getElementById('btnSave').innerText = "Guardar";
             document.getElementById('btnCancel').style.display = 'none';
         }
 
-        function editProduct(id) {
-            const p = products.find(x => x.id === id);
-            if (!p) return;
-
-            // Abrir panel si está cerrado (opcional, ya debería estar abierto para ver el botón)
-            if(!document.getElementById('appBody').classList.contains('admin-visible')) toggleAdmin();
-
-            // Rellenar formulario
-            document.getElementById('editId').value = p.id;
-            document.getElementById('prodName').value = p.name;
-            document.getElementById('prodPrice').value = p.price;
-            document.getElementById('prodPromo').value = p.promoPrice || '';
-            document.getElementById('prodImg').value = p.img;
-            document.getElementById('prodCat').value = p.cat;
-            document.getElementById('prodStock').checked = p.hasStock;
-
-            // Cambiar UI del formulario
-            document.getElementById('formTitle').innerText = "Editar Producto";
-            document.getElementById('btnSave').innerText = "Actualizar Cambios";
-            document.getElementById('btnCancel').style.display = 'block';
-
-            // Scroll arriba
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function saveProduct() {
-            const idInput = document.getElementById('editId').value;
-            const name = document.getElementById('prodName').value;
-            const price = parseFloat(document.getElementById('prodPrice').value);
-            const promo = document.getElementById('prodPromo').value ? parseFloat(document.getElementById('prodPromo').value) : null;
-            const img = document.getElementById('prodImg').value || "https://via.placeholder.com/300x300?text=Sin+Foto";
-            const cat = document.getElementById('prodCat').value || "General";
-            const hasStock = document.getElementById('prodStock').checked;
-
-            if (!name || isNaN(price)) return alert("Nombre y precio son obligatorios");
-
-            if (idInput) {
-                // MODO EDICIÓN
-                const index = products.findIndex(p => p.id == idInput);
-                if (index !== -1) {
-                    products[index] = { ...products[index], name, price, promoPrice: promo, img, cat, hasStock };
-                }
-            } else {
-                // MODO CREACIÓN
-                const newProd = {
-                    id: Date.now(),
-                    name,
-                    price,
-                    promoPrice: promo,
-                    img,
-                    cat,
-                    hasStock
-                };
-                products.push(newProd);
-            }
-
-            saveData();
-            resetForm();
-            renderCategories();
-            renderProducts(activeCategory);
-            // alert(idInput ? "Producto Actualizado" : "Producto Creado");
-        }
-
-        function deleteProduct(id) {
-            if(!confirm("¿Borrar definitivamente?")) return;
-            products = products.filter(p => p.id !== id);
-            saveData();
-            renderProducts(activeCategory);
-            renderCategories();
-        }
-
-        function saveData() {
-            localStorage.setItem('shopProducts_v2', JSON.stringify(products));
-        }
-
-        // --- RENDERIZADO ---
+        /* --- UI RENDER --- */
         function renderCategories() {
             const cats = ['Todos', ...new Set(products.map(p => p.cat))];
-            const container = document.getElementById('catContainer');
-            const dataList = document.getElementById('catList');
-            
-            container.innerHTML = '';
-            dataList.innerHTML = '';
-
-            cats.forEach(c => {
-                const key = c === 'Todos' ? 'all' : c;
-                const activeClass = activeCategory === key ? 'active' : '';
-                container.innerHTML += `<button class="cat-btn ${activeClass}" onclick="filterCat('${key}')">${c}</button>`;
-                if(c !== 'Todos') dataList.innerHTML += `<option value="${c}">`;
+            const c = document.getElementById('catContainer');
+            c.innerHTML = ''; document.getElementById('catList').innerHTML = '';
+            cats.forEach(x => {
+                const key = x === 'Todos' ? 'all' : x;
+                c.innerHTML += `<button class="cat-btn ${activeCategory===key?'active':''}" onclick="filter('${key}')">${x}</button>`;
+                if(x!=='Todos') document.getElementById('catList').innerHTML += `<option value="${x}">`;
             });
         }
 
+        function filter(cat) { activeCategory = cat; renderCategories(); renderProducts(cat); }
+
         function renderProducts(filter) {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = '';
+            const g = document.getElementById('productGrid');
+            g.innerHTML = '';
+            const list = filter === 'all' ? products : products.filter(p => p.cat === filter);
+            if (list.length === 0) return g.innerHTML = '<p style="text-align:center;width:100%;color:#999">Sin productos</p>';
             
-            const filtered = filter === 'all' ? products : products.filter(p => p.cat === filter);
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; width:100%; color:#999; margin-top:30px;">No hay productos aquí.</p>';
-                return;
-            }
-
-            filtered.forEach(p => {
-                // Lógica de precios y stock
-                const finalPrice = p.promoPrice || p.price;
+            list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
-                const stockClass = p.hasStock ? '' : 'no-stock';
-                const stockOverlay = p.hasStock ? '' : '<div class="badge badge-stock">AGOTADO</div>';
+                const priceDisplay = isPromo 
+                    ? `<span class="price-old">$${p.price}</span> <span class="price-curr price-promo">$${p.promoPrice}</span>`
+                    : `<span class="price-curr">$${p.price}</span>`;
                 
-                // HTML del precio
-                let priceHtml = `<div class="price-curr">$${p.price}</div>`;
-                let badgeHtml = '';
-
-                if (isPromo) {
-                    priceHtml = `
-                        <span class="price-old">$${p.price}</span>
-                        <span class="price-curr price-promo">$${p.promoPrice}</span>
-                    `;
-                    badgeHtml = `<div class="badge badge-promo">OFERTA</div>`;
-                }
-
-                grid.innerHTML += `
-                    <div class="card ${stockClass}">
+                g.innerHTML += `
+                    <div class="card ${!p.hasStock?'no-stock':''}">
                         <div class="admin-actions">
                             <button class="action-btn btn-edit" onclick="editProduct(${p.id})">✏️</button>
                             <button class="action-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button>
                         </div>
-                        
                         <div class="card-img-container">
-                            ${badgeHtml}
-                            ${stockOverlay}
-                            <img src="${p.img}" class="card-img" alt="${p.name}" loading="lazy">
+                            ${isPromo ? '<div class="badge badge-promo">OFERTA</div>' : ''}
+                            ${!p.hasStock ? '<div class="badge badge-stock">AGOTADO</div>' : ''}
+                            <img src="${p.img}" class="card-img" loading="lazy">
                         </div>
-                        
                         <div class="card-body">
-                            <div>
-                                <h4 class="card-title">${p.name}</h4>
-                                <div class="price-container">${priceHtml}</div>
-                            </div>
-                            <button class="add-btn" onclick="addToCart(${p.id})" ${!p.hasStock ? 'disabled' : ''}>
-                                ${p.hasStock ? 'Agregar' : 'Sin Stock'}
-                            </button>
+                            <h4 class="card-title">${p.name}</h4>
+                            <div class="price-container">${priceDisplay}</div>
+                            <button class="add-btn" onclick="addToCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'Agregar':'Sin Stock'}</button>
                         </div>
-                    </div>
-                `;
-            });
-        }
-
-        function filterCat(cat) {
-            activeCategory = cat;
-            renderCategories();
-            renderProducts(cat);
-        }
-
-        // --- CARRITO ---
-        function addToCart(id) {
-            const prod = products.find(p => p.id === id);
-            if (!prod || !prod.hasStock) return;
-            
-            cart.push(prod);
-            updateCartUI();
-            
-            // Pequeña animación feedback
-            const btn = document.getElementById('cartBtn');
-            btn.style.transform = "translateX(-50%) scale(1.1)";
-            setTimeout(() => btn.style.transform = "translateX(-50%) scale(1)", 200);
-        }
-
-        function updateCartUI() {
-            const total = cart.reduce((sum, item) => sum + (item.promoPrice || item.price), 0);
-            document.getElementById('cartCount').innerText = cart.length;
-            document.getElementById('cartTotal').innerText = '$' + total;
-            document.getElementById('modalTotal').innerText = '$' + total;
-            
-            if(cart.length > 0) document.getElementById('cartBtn').style.display = 'flex';
-            else document.getElementById('cartBtn').style.display = 'none';
-        }
-
-        function openCart() {
-            const list = document.getElementById('cartItemsList');
-            list.innerHTML = '';
-            
-            // Agrupar items por ID
-            const grouped = {};
-            cart.forEach(item => {
-                if(!grouped[item.id]) grouped[item.id] = { ...item, count: 0 };
-                grouped[item.id].count++;
-            });
-
-            let msg = "👋 Hola! Quiero realizar el siguiente pedido:%0A%0A";
-
-            Object.values(grouped).forEach(item => {
-                const price = item.promoPrice || item.price;
-                const subtotal = price * item.count;
-                
-                list.innerHTML += `
-                    <div class="cart-item">
-                        <div class="cart-item-info">
-                            <span class="cart-item-title">${item.name} (x${item.count})</span>
-                            <span class="cart-item-price">$${price} c/u</span>
-                        </div>
-                        <b>$${subtotal}</b>
                     </div>`;
-                
-                msg += `• *${item.count}x ${item.name}*: $${subtotal}%0A`;
             });
+        }
 
-            const total = cart.reduce((sum, i) => sum + (i.promoPrice || i.price), 0);
-            msg += `%0A💰 *TOTAL: $${total}*`;
-            
-            // Link WA
-            const phone = config.phone.replace(/[^0-9]/g, "") || ""; 
-            document.getElementById('waLink').href = `https://wa.me/${phone}?text=${msg}`;
-
+        /* --- CART --- */
+        function addToCart(id) {
+            const p = products.find(x => x.id === id);
+            if(p && p.hasStock) { cart.push(p); updateCart(); }
+        }
+        function updateCart() {
+            const tot = cart.reduce((s, i) => s + (i.promoPrice||i.price), 0);
+            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('cartTotal').innerText = '$' + tot;
+            document.getElementById('modalTotal').innerText = '$' + tot;
+            document.getElementById('cartBtn').style.display = cart.length ? 'flex' : 'none';
+        }
+        function openCart() {
+            const lst = document.getElementById('cartItemsList'); lst.innerHTML = '';
+            const grp = {};
+            cart.forEach(i => { if(!grp[i.id]) grp[i.id]={...i,c:0}; grp[i.id].c++; });
+            let msg = "Hola! Quiero pedir:%0A";
+            Object.values(grp).forEach(i => {
+                const pr = i.promoPrice||i.price;
+                lst.innerHTML += `<div class="cart-item"><span>${i.name} (x${i.c})</span><b>$${pr*i.c}</b></div>`;
+                msg += `- ${i.name} (x${i.c}): $${pr*i.c}%0A`;
+            });
+            msg += `%0ATotal: $${cart.reduce((s,x)=>s+(x.promoPrice||x.price),0)}`;
+            document.getElementById('waLink').href = `https://wa.me/${config.phone.replace(/[^0-9]/g,"")}?text=${msg}`;
             document.getElementById('cartModal').style.display = 'flex';
         }
+        function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
+        function clearCart() { cart=[]; updateCart(); closeCart(); }
 
-        function closeCart() {
-            document.getElementById('cartModal').style.display = 'none';
-        }
-        
-        function clearCart() {
-            if(confirm("¿Vaciar carrito?")) {
-                cart = [];
-                updateCartUI();
-                closeCart();
-            }
-        }
-
-        // Arrancar
         init();
-
     </script>
 </body>
 </html>
