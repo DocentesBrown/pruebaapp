@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tienda Cloud Admin</title>
+    <title>Mi Tienda Online</title>
     <style>
+        /* ESTILOS VISUALES */
         :root { --primary: #008069; --accent: #e53935; --bg: #f4f4f9; --card: #ffffff; --text: #333; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         
@@ -13,12 +14,12 @@
         .brand { font-weight: 800; font-size: 1.2rem; }
         .admin-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
 
-        /* LOADING */
+        /* PANTALLA DE CARGA */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; }
         .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ADMIN PANEL */
+        /* PANEL ADMINISTRADOR */
         #adminPanel { display: none; background: white; padding: 20px; border-bottom: 2px solid #ddd; animation: slideDown 0.3s; }
         .admin-visible #adminPanel { display: block; }
         @keyframes slideDown { from {transform: translateY(-20px); opacity:0;} to {transform: translateY(0); opacity:1;} }
@@ -29,18 +30,19 @@
         .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
         .btn-sec { background: #777; }
         
-        /* FILE UPLOAD */
-        .file-upload-wrapper { position: relative; margin-bottom: 10px; border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; }
+        /* ZONA DE SUBIDA DE ARCHIVOS */
+        .file-upload-wrapper { position: relative; margin-bottom: 10px; border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; transition: 0.3s; }
+        .file-upload-wrapper.uploading { background: #e0f7fa; border-color: var(--primary); }
         .file-upload-wrapper input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer; }
         .upload-text { color: #666; font-size: 0.9rem; pointer-events: none; }
 
-        /* LOGIN MODAL */
+        /* MODAL DE LOGIN */
         .login-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 30px; border-radius: 15px; width: 80%; max-width: 300px; text-align: center; }
         .login-box h3 { margin-top: 0; }
         .link-btn { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 10px; font-size: 0.8rem; }
 
-        /* UI ELEMENTS */
+        /* GRILLA DE PRODUCTOS */
         .cat-bar { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: var(--bg); }
         .cat-pill { background: white; padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; white-space: nowrap; cursor: pointer; }
         .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -67,7 +69,7 @@
         .promo { color: var(--accent); }
         .buy-btn { margin-top: auto; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
         
-        /* CART */
+        /* CARRITO FLOTANTE */
         .cart-fab { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 12px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 500; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
         .modal-body { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 80vh; overflow-y: auto; }
@@ -119,11 +121,11 @@
             <input type="number" id="pPromo" placeholder="Promo (Opcional)">
         </div>
 
-        <div class="file-upload-wrapper">
-            <span id="uploadStatus" class="upload-text">📸 Toca para subir a Drive</span>
+        <div class="file-upload-wrapper" id="uploadWrapper">
+            <span id="uploadStatus" class="upload-text">📸 Toca para subir FOTO a Drive</span>
             <input type="file" id="fileInput" accept="image/*" onchange="uploadToDrive()">
         </div>
-        <input type="text" id="pImg" placeholder="Link de imagen..." style="font-size:12px; color:#666;" readonly>
+        <input type="text" id="pImg" placeholder="Link de imagen..." style="font-size:12px; color:#666; background:#eee;" readonly>
 
         <div class="form-row">
             <input type="text" id="pCat" placeholder="Categoría" list="catDatalist">
@@ -144,20 +146,20 @@
     </div>
     <div class="modal-overlay" id="cartModal" onclick="if(event.target===this)closeCart()">
         <div class="modal-body">
-            <div style="display:flex; justify-content:space-between;"><h2>Pedido</h2><span onclick="closeCart()">✕</span></div>
+            <div style="display:flex; justify-content:space-between;"><h2>Pedido</h2><span onclick="closeCart()" style="cursor:pointer; font-size:1.5rem;">✕</span></div>
             <div id="cartList"></div>
             <h3>Total: <span id="modalTotal">$0</span></h3>
-            <a href="#" id="waLink" class="wa-btn" target="_blank">Enviar Pedido</a>
-            <p onclick="clearCart()" style="text-align:center; margin-top:15px; text-decoration:underline;">Vaciar</p>
+            <a href="#" id="waLink" class="wa-btn" target="_blank">Enviar Pedido por WhatsApp</a>
+            <p onclick="clearCart()" style="text-align:center; margin-top:15px; text-decoration:underline; cursor:pointer; color:#999;">Vaciar Carrito</p>
         </div>
     </div>
 
     <script>
         // ==========================================
-        //  CONFIGURACIÓN (SIN IMGBB)
+        //  TUS DATOS CONFIGURADOS
         // ==========================================
         
-        const API_URL = "PEGAR_AQUI_LA_URL_DEL_SCRIPT_GOOGLE";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxMUSMKycILcGWQVbUbAy7MtgvvvWhM0-QdlMdp4sXxirDHKz-LvaQgaYuku3Td8puS4Q/exec";
         const PHONE = "5491138614767"; 
 
         // ==========================================
@@ -165,39 +167,84 @@
         let products = [], cart = [], activeCat = 'all';
         let isLoggedIn = false;
 
-        // --- LOGIN ---
+        // --- SISTEMA DE LOGIN (LUCAS / FAGA) ---
         function getCreds() { const s = localStorage.getItem('shop_creds'); return s ? JSON.parse(s) : { u: 'LUCAS', p: 'FAGA' }; }
-        function checkLoginAccess() { isLoggedIn ? document.getElementById('mainBody').classList.toggle('admin-visible') : (document.getElementById('loginModal').style.display='flex', document.getElementById('loginFormBox').style.display='block', document.getElementById('changePassBox').style.display='none'); }
-        function doLogin() {
-            const u = document.getElementById('loginUser').value, p = document.getElementById('loginPass').value, c = getCreds();
-            if (u === c.u && p === c.p) { isLoggedIn = true; closeLogin(); document.getElementById('mainBody').classList.add('admin-visible'); document.getElementById('loginUser').value=''; document.getElementById('loginPass').value=''; } 
-            else alert("Usuario o Clave incorrectos");
+        
+        function checkLoginAccess() { 
+            if (isLoggedIn) {
+                document.getElementById('mainBody').classList.toggle('admin-visible');
+            } else {
+                document.getElementById('loginModal').style.display='flex';
+                document.getElementById('loginFormBox').style.display='block';
+                document.getElementById('changePassBox').style.display='none';
+            }
         }
+        
+        function doLogin() {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            const c = getCreds();
+            
+            if (u === c.u && p === c.p) { 
+                isLoggedIn = true; 
+                closeLogin(); 
+                document.getElementById('mainBody').classList.add('admin-visible'); 
+                document.getElementById('loginUser').value=''; 
+                document.getElementById('loginPass').value=''; 
+            } else {
+                alert("Usuario o Clave incorrectos");
+            }
+        }
+        
         function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
-        function logout() { isLoggedIn = false; document.getElementById('mainBody').classList.remove('admin-visible'); alert("Sesión Cerrada"); }
-        function togglePassMode(show) { document.getElementById('loginFormBox').style.display = show?'none':'block'; document.getElementById('changePassBox').style.display = show?'block':'none'; }
+        
+        function logout() { 
+            isLoggedIn = false; 
+            document.getElementById('mainBody').classList.remove('admin-visible'); 
+            alert("Has cerrado sesión"); 
+        }
+        
+        function togglePassMode(show) { 
+            document.getElementById('loginFormBox').style.display = show?'none':'block'; 
+            document.getElementById('changePassBox').style.display = show?'block':'none'; 
+        }
+        
         function saveNewPass() {
-            const o = document.getElementById('oldPass').value, n = document.getElementById('newPass').value, c = document.getElementById('confirmPass').value, r = getCreds();
-            if (o !== r.p) return alert("Clave actual incorrecta"); if (n !== c) return alert("No coinciden"); if (n.length<4) return alert("Muy corta");
-            localStorage.setItem('shop_creds', JSON.stringify({ u: 'LUCAS', p: n })); alert("Clave cambiada"); closeLogin();
-            document.getElementById('oldPass').value=''; document.getElementById('newPass').value=''; document.getElementById('confirmPass').value='';
+            const o = document.getElementById('oldPass').value;
+            const n = document.getElementById('newPass').value;
+            const c = document.getElementById('confirmPass').value;
+            const r = getCreds();
+            
+            if (o !== r.p) return alert("La clave actual es incorrecta");
+            if (n !== c) return alert("Las claves nuevas no coinciden");
+            if (n.length<4) return alert("La clave es muy corta");
+            
+            localStorage.setItem('shop_creds', JSON.stringify({ u: 'LUCAS', p: n })); 
+            alert("¡Clave cambiada con éxito!"); 
+            closeLogin();
+            document.getElementById('oldPass').value=''; 
+            document.getElementById('newPass').value=''; 
+            document.getElementById('confirmPass').value='';
         }
 
-        // --- SUBIDA A GOOGLE DRIVE (NUEVO) ---
+        // --- SUBIDA A GOOGLE DRIVE (Lógica Nueva) ---
         function uploadToDrive() {
             const file = document.getElementById('fileInput').files[0];
             const status = document.getElementById('uploadStatus');
+            const wrapper = document.getElementById('uploadWrapper');
             
             if(!file) return;
-            if(file.size > 5 * 1024 * 1024) return alert("La imagen es muy pesada. Máximo 5MB.");
+            if(file.size > 5 * 1024 * 1024) return alert("La imagen es muy pesada. Intenta con una de menos de 5MB.");
 
-            status.innerText = "⏳ Subiendo a Drive... (puede tardar)";
+            status.innerText = "⏳ Subiendo a Drive... (Espera)";
             status.style.fontWeight = "bold";
+            wrapper.classList.add('uploading');
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async function() {
-                const base64Content = reader.result.split(',')[1]; // Quitar cabecera data:image...
+                // Quitar la cabecera 'data:image/jpeg;base64,' para enviar solo los bytes
+                const base64Content = reader.result.split(',')[1]; 
                 
                 const payload = {
                     action: "uploadImage",
@@ -207,27 +254,32 @@
                 };
 
                 try {
-                    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+                    const res = await fetch(API_URL, { 
+                        method: "POST", 
+                        body: JSON.stringify(payload) 
+                    });
                     const data = await res.json();
                     
                     if(data.result === "success") {
                         document.getElementById('pImg').value = data.url;
-                        status.innerText = "✅ ¡Guardada en Drive!";
+                        status.innerText = "✅ ¡Foto Guardada en Drive!";
                         status.style.color = "green";
+                        wrapper.classList.remove('uploading');
                     } else {
-                        throw new Error(data.message || "Error script");
+                        throw new Error(data.message || "Error desconocido");
                     }
                 } catch(e) {
-                    status.innerText = "❌ Error al subir";
+                    status.innerText = "❌ Error al subir. Revisa tu conexión.";
                     status.style.color = "red";
-                    alert("Error subiendo: " + e);
+                    wrapper.classList.remove('uploading');
+                    console.error(e);
+                    alert("Error subiendo imagen: " + e);
                 }
             };
         }
 
-        // --- TIENDA ---
+        // --- CONEXIÓN CON TU SCRIPT (CRUD) ---
         async function init() {
-            if(API_URL.includes("PEGAR")) return alert("Falta configurar la URL del Script");
             showLoader(true, "Conectando...");
             try {
                 const res = await fetch(API_URL);
@@ -235,18 +287,27 @@
                 products = data.products || [];
                 renderCats();
                 renderGrid('all');
-            } catch (err) { console.error(err); } finally { showLoader(false); }
+            } catch (err) { 
+                console.error(err); 
+                alert("No se pudo conectar con la tienda. Revisa tu internet.");
+            } finally { 
+                showLoader(false); 
+            }
         }
 
         async function saveProductToServer() {
             const imgVal = document.getElementById('pImg').value;
-            if (!imgVal) return alert("Falta la imagen (súbela a Drive primero).");
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+
+            if (!name || !price) return alert("Nombre y Precio son obligatorios.");
+            if (!imgVal) return alert("Debes subir una foto primero.");
             
             const payload = {
                 action: document.getElementById('editId').value ? "edit" : "add",
                 id: document.getElementById('editId').value || Date.now(),
-                name: document.getElementById('pName').value,
-                price: document.getElementById('pPrice').value,
+                name: name,
+                price: price,
                 promo: document.getElementById('pPromo').value,
                 img: imgVal,
                 cat: document.getElementById('pCat').value || "Varios",
@@ -258,29 +319,55 @@
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 cancelEdit();
                 await init();
-                alert("Guardado");
-            } catch (err) { alert("Error al guardar"); } finally { showLoader(false); }
+                alert("¡Guardado correctamente!");
+            } catch (err) { 
+                alert("Error al guardar. Intenta de nuevo."); 
+            } finally { 
+                showLoader(false); 
+            }
         }
 
         async function deleteProduct(id) {
-            if(!confirm("¿Borrar?")) return;
+            if(!confirm("¿Estás seguro de borrar este producto?")) return;
             showLoader(true, "Borrando...");
-            try { await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) }); await init(); }
-            catch(e) { alert("Error"); } finally { showLoader(false); }
+            try { 
+                await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) }); 
+                await init(); 
+            } catch(e) { 
+                alert("Error al borrar"); 
+            } finally { 
+                showLoader(false); 
+            }
         }
 
-        // --- UI ---
-        function showLoader(show, msg) { if(msg) document.getElementById('loaderMsg').innerText = msg; document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+        // --- INTERFAZ USUARIO ---
+        function showLoader(show, msg) { 
+            if(msg) document.getElementById('loaderMsg').innerText = msg; 
+            document.getElementById('loader').style.display = show ? 'flex' : 'none'; 
+        }
+        
         function renderCats() {
             const cats = ['Todos', ...new Set(products.map(p => p.cat))];
-            const c = document.getElementById('catContainer'); const dl = document.getElementById('catDatalist');
+            const c = document.getElementById('catContainer'); 
+            const dl = document.getElementById('catDatalist');
             c.innerHTML = ''; dl.innerHTML = '';
-            cats.forEach(x => { c.innerHTML += `<div class="cat-pill ${activeCat===x?'active':''}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`; if(x!=='Todos') dl.innerHTML += `<option value="${x}">`; });
+            cats.forEach(x => { 
+                c.innerHTML += `<div class="cat-pill ${activeCat===x?'active':''}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`; 
+                if(x!=='Todos') dl.innerHTML += `<option value="${x}">`; 
+            });
         }
+        
         function filter(c) { activeCat=c; renderCats(); renderGrid(c); }
+        
         function renderGrid(c) {
             const g = document.getElementById('grid'); g.innerHTML = '';
             const list = c === 'all' ? products : products.filter(p => p.cat === c);
+            
+            if(list.length === 0) {
+                g.innerHTML = '<p style="text-align:center; width:100%; color:#888; margin-top:30px;">No hay productos aquí.</p>';
+                return;
+            }
+
             list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
                 g.innerHTML += `
@@ -292,7 +379,7 @@
                     <div class="img-box">
                         ${isPromo?'<span class="badge bg-promo">OFERTA</span>':''}
                         ${!p.hasStock?'<span class="badge bg-stock">AGOTADO</span>':''}
-                        <img src="${p.img}">
+                        <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Error+Imagen'">
                     </div>
                     <div class="info">
                         <div style="font-weight:bold; margin-bottom:5px;">${p.name}</div>
@@ -302,6 +389,7 @@
                 </div>`;
             });
         }
+        
         function editP(p) {
             if(!isLoggedIn) return checkLoginAccess();
             document.getElementById('editId').value = p.id;
@@ -311,42 +399,61 @@
             document.getElementById('pImg').value = p.img;
             document.getElementById('pCat').value = p.cat;
             document.getElementById('pStock').value = p.hasStock?'SI':'NO';
+            
             document.getElementById('uploadStatus').innerText = "✅ Imagen actual en Drive";
-            document.getElementById('btnSave').innerText = "Actualizar";
+            document.getElementById('uploadStatus').style.color = "green";
+            
+            document.getElementById('btnSave').innerText = "Actualizar Producto";
             document.getElementById('btnCancel').style.display = 'block';
             document.getElementById('formTitle').innerText = "Editar Producto";
             window.scrollTo(0,0);
         }
+        
         function cancelEdit() {
             document.getElementById('editId').value = '';
             document.getElementById('pName').value = '';
             document.getElementById('pPrice').value = '';
             document.getElementById('pPromo').value = '';
             document.getElementById('pImg').value = '';
-            document.getElementById('uploadStatus').innerText = "📸 Toca para subir a Drive";
             document.getElementById('fileInput').value = "";
+            
+            document.getElementById('uploadStatus').innerText = "📸 Toca para subir FOTO a Drive";
+            document.getElementById('uploadStatus').style.color = "#666";
+            
             document.getElementById('btnSave').innerText = "Guardar Producto";
             document.getElementById('btnCancel').style.display = 'none';
             document.getElementById('formTitle').innerText = "Nuevo Producto";
         }
+        
+        // --- CARRITO ---
         function addCart(id) { const p = products.find(x=>x.id==id); if(p&&p.hasStock){ cart.push(p); updateCart(); } }
+        
         function updateCart() {
             const t = cart.reduce((a,b)=>a+(b.promoPrice||b.price),0);
-            document.getElementById('cartCount').innerText = cart.length; document.getElementById('cartTotal').innerText = '$'+t; document.getElementById('modalTotal').innerText = '$'+t;
+            document.getElementById('cartCount').innerText = cart.length; 
+            document.getElementById('cartTotal').innerText = '$'+t; 
+            document.getElementById('modalTotal').innerText = '$'+t;
             document.getElementById('cartBtn').style.display = cart.length?'flex':'none';
         }
+        
         function openCart() {
             const l = document.getElementById('cartList'); l.innerHTML = '';
             const g = {}; cart.forEach(i=>{ if(!g[i.id])g[i.id]={...i,q:0}; g[i.id].q++; });
-            let msg = "Hola! Quiero pedir:%0A";
-            Object.values(g).forEach(i=>{ const pr = i.promoPrice||i.price; l.innerHTML+=`<div class="cart-row"><span>${i.name} (x${i.q})</span><b>$${pr*i.q}</b></div>`; msg+=`- ${i.name} (x${i.q}): $${pr*i.q}%0A`; });
-            msg+=`%0ATotal: $${cart.reduce((a,b)=>a+(b.promoPrice||b.price),0)}`;
+            let msg = "👋 Hola! Quiero realizar el siguiente pedido:%0A%0A";
+            Object.values(g).forEach(i=>{ 
+                const pr = i.promoPrice||i.price; 
+                l.innerHTML+=`<div class="cart-row"><span>${i.name} (x${i.q})</span><b>$${pr*i.q}</b></div>`; 
+                msg+=`• *${i.q}x ${i.name}*: $${pr*i.q}%0A`; 
+            });
+            msg+=`%0A💰 *TOTAL: $${cart.reduce((a,b)=>a+(b.promoPrice||b.price),0)}*`;
             document.getElementById('waLink').href=`https://wa.me/${PHONE}?text=${msg}`;
             document.getElementById('cartModal').style.display='flex';
         }
+        
         function closeCart(){document.getElementById('cartModal').style.display='none';}
         function clearCart(){cart=[];updateCart();closeCart();}
 
+        // ARRANCAR APP
         init();
     </script>
 </body>
