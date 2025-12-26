@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mi Tienda</title>
     <style>
-        /* --- VARIABLES --- */
         :root {
             --primary: #007AFF; --accent: #FF3B30; --bg: #F2F2F7;
             --card: #FFFFFF; --text: #000000; --text-sec: #8E8E93;
-            --radius: 12px; --max-width: 1100px;
+            --radius: 14px; --max-width: 1100px;
         }
 
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 
-        /* LAYOUT PC */
         .app-container { max-width: var(--max-width); margin: 0 auto; min-height: 100vh; }
 
         /* HEADER */
@@ -24,7 +22,7 @@
         .btn-icon { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--primary); }
         .btn-text { background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--primary); cursor: pointer; }
 
-        /* SIDEBAR Y BOTONES BONITOS */
+        /* SIDEBAR Y BOTONES SOCIALES (CON RELLENO) */
         .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: white; z-index: 2000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar.open { left: 0; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1999; display:none; opacity:0; transition:0.3s; }
@@ -35,10 +33,10 @@
         .sidebar-item:hover, .sidebar-item.active { background: #f0f7ff; color: var(--primary); }
         
         .sidebar-foot { padding:20px; border-top:1px solid #eee; }
-        /* Estilos de botones de contacto recuperados */
-        .contact-btn { display: flex; align-items: center; gap: 15px; text-decoration: none; color: #333; margin-bottom: 12px; padding: 15px; background: white; border-radius: 12px; border: 2px solid #eee; font-weight: 700; transition: 0.2s; }
-        .contact-btn.wa { color: #25D366; border-color: #25D366; } .contact-btn.wa:hover { background: #eafff0; }
-        .contact-btn.ig { color: #E1306C; border-color: #E1306C; } .contact-btn.ig:hover { background: #fff0f5; }
+        /* BOTONES SOCIALES SOLIDOS */
+        .contact-btn { display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; margin-bottom: 12px; padding: 15px; border-radius: 12px; font-weight: 700; transition: 0.2s; border:none; }
+        .contact-btn.wa { background: #25D366; } 
+        .contact-btn.ig { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); }
         .contact-btn span { font-size: 1.5rem; }
 
         /* ADMIN PANEL */
@@ -51,13 +49,12 @@
         input:focus, textarea:focus { border-color: var(--primary); background: white; outline: none; }
         .photo-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
         .btn-photo { background: #f0f7ff; border: 2px dashed var(--primary); border-radius: 12px; padding: 25px; cursor: pointer; text-align: center; color: var(--primary); font-weight: 600; transition:0.2s; }
-        .btn-photo:hover, .btn-photo:active { background: var(--primary); color: white; }
         .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
+        .btn-primary { background: var(--primary); color: white; }
         .btn-sec { background: #f2f2f7; color: #333; margin-top: 10px; }
         .btn-danger { background: #ff3b30; color: white; margin-top: 20px; }
 
-        /* CATEGORIAS Y GRILLA */
+        /* UI */
         .cat-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 20px; scrollbar-width: none; background: var(--bg); }
         .cat-pill { background: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition:0.2s; color: #666; }
         .cat-pill.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
@@ -68,20 +65,31 @@
         .card { background: white; border-radius: var(--radius); overflow: hidden; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; }
         @media (min-width: 1024px) { .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); } }
         .card.no-stock { opacity: 0.6; filter: grayscale(0.5); }
-        /* Animación para Link Directo */
-        @keyframes flashHighlight { 0%, 100% {box-shadow: 0 4px 15px rgba(0,0,0,0.05);} 50% {box-shadow: 0 0 0 4px var(--primary), 0 15px 40px rgba(0,122,255,0.4); transform: scale(1.02);} }
+        
         .highlight-card { animation: flashHighlight 1.5s ease-in-out 2; z-index: 10; }
+        @keyframes flashHighlight { 0%, 100% {box-shadow: 0 4px 15px rgba(0,0,0,0.05);} 50% {box-shadow: 0 0 0 4px var(--primary), 0 15px 40px rgba(0,122,255,0.4); transform: scale(1.02);} }
 
         .img-wrap { width: 100%; aspect-ratio: 1/1; position: relative; background: #f0f0f0; }
         .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .badge { position: absolute; top: 12px; left: 12px; padding: 6px 10px; border-radius: 6px; color: white; font-size: 0.75rem; font-weight: 800; backdrop-filter: blur(4px); }
         .bg-promo { background: var(--accent); } .bg-stock { background: rgba(0,0,0,0.7); top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 1.1rem; }
 
+        /* BOTÓN COMPARTIR SUTIL */
+        .btn-share {
+            position: absolute; top: 10px; right: 10px;
+            width: 35px; height: 35px; border-radius: 50%;
+            background: rgba(255,255,255,0.5); border: none; 
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer; color: #333; z-index: 5;
+            transition: 0.2s;
+        }
+        .btn-share:hover { background: rgba(255,255,255,0.9); }
+
         .card-info { padding: 15px; display:flex; flex-direction:column; flex-grow:1; }
         .c-title { font-weight: 700; margin-bottom: 6px; color: var(--text); font-size: 1.1rem; }
         .c-desc { font-size: 0.9rem; color: var(--text-sec); margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
-        /* --- NUEVO: VARIANTES --- */
         .variants-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .var-pill { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: #666; cursor: pointer; transition: 0.2s; }
         .var-pill.selected { background: var(--primary); color: white; border-color: var(--primary); }
@@ -89,14 +97,24 @@
         .c-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
         .c-price { font-weight: 800; font-size: 1.3rem; }
         .old-p { text-decoration: line-through; color: var(--text-sec); font-size: 0.9rem; margin-right: 6px; }
-        .btn-add { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,122,255,0.3); }
-        .btn-add:active { transform: scale(0.9); } .card.no-stock .btn-add { background: #ccc; box-shadow: none; }
         
-        .card-actions { position: absolute; top:10px; right:10px; display:none; gap:8px; z-index: 20; }
+        /* BOTÓN AGREGAR CON CONTADOR */
+        .btn-add { 
+            width: auto; min-width: 40px; height: 40px; border-radius: 20px; padding: 0 10px;
+            background: var(--primary); color: white; border: none; 
+            font-size: 1.2rem; font-weight: 700; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: 0.2s; box-shadow: 0 4px 10px rgba(0,122,255,0.3); 
+        }
+        .btn-add:active { transform: scale(0.9); } 
+        .card.no-stock .btn-add { background: #ccc; box-shadow: none; pointer-events: none; }
+        .qty-badge { font-size: 1rem; margin-left: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; }
+
+        .card-actions { position: absolute; top:10px; right:50px; display:none; gap:8px; z-index: 20; }
         .admin-visible .card-actions { display:flex; }
         .act-btn { width:36px; height:36px; border-radius:50%; background:white; border:none; box-shadow:0 4px 10px rgba(0,0,0,0.1); cursor:pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
 
-        /* DOCK & MODALES (Igual que antes) */
+        /* MODALES ETC */
         .dock { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1c1c1e; color: white; padding: 15px 30px; border-radius: 40px; display: flex; align-items: center; gap: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); cursor: pointer; z-index: 500; transition: 0.3s; width: auto; min-width: 280px; justify-content: space-between; }
         .dock:hover { transform: translateX(-50%) scale(1.05); }
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
@@ -134,7 +152,7 @@
                     <span>💬</span> WhatsApp
                 </a>
                 <a href="#" id="igContact" target="_blank" class="contact-btn ig">
-                    <span>📸</span> Instagram
+                    <span>📷</span> Instagram
                 </a>
             </div>
         </div>
@@ -145,32 +163,26 @@
                 <button class="btn-text" onclick="togglePassMode(true)">Cambiar Clave</button>
             </div>
             <input type="hidden" id="editId">
-            
             <div class="form-grid">
                 <input type="text" id="pName" placeholder="Nombre del Producto">
                 <input type="text" id="pCat" placeholder="Categoría" list="catDatalist">
             </div>
             <textarea id="pDesc" placeholder="Descripción..." style="margin-top:15px; height:80px;"></textarea>
-            <input type="text" id="pVars" placeholder="Variantes separadas por coma (Ej: S, M, L o Rojo, Azul)" style="margin-top:15px; background:#fffbe6; border-color:#ffe58f;">
-            
+            <input type="text" id="pVars" placeholder="Variantes separadas por coma (Ej: S, M, L)" style="margin-top:15px; background:#fffbe6; border-color:#ffe58f;">
             <div class="form-grid" style="margin-top:15px;">
                 <input type="number" id="pPrice" placeholder="Precio ($)">
                 <input type="number" id="pPromo" placeholder="Promo (Opcional)">
             </div>
-            
             <div class="photo-area">
                 <div class="btn-photo" onclick="document.getElementById('fileInputCam').click()">📸 CÁMARA</div>
                 <div class="btn-photo" onclick="document.getElementById('fileInputGal').click()">🖼️ GALERÍA</div>
             </div>
             <div id="uploadStatus" style="text-align:center; color:#666; font-weight:600; margin-bottom:20px;">Sube una foto</div>
-
             <input type="file" id="fileInputCam" accept="image/*" capture="environment" onchange="uploadToDrive(this)" style="display:none;">
             <input type="file" id="fileInputGal" accept="image/*" onchange="uploadToDrive(this)" style="display:none;">
             <input type="hidden" id="pImg">
-
             <select id="pStock"><option value="SI">✅ Hay Stock</option><option value="NO">❌ Agotado</option></select>
             <datalist id="catDatalist"></datalist>
-
             <div class="form-grid" style="margin-top:25px;">
                 <button class="btn btn-primary" onclick="saveProductToServer()" id="btnSave">GUARDAR</button>
                 <button class="btn btn-sec" onclick="cancelEdit()" id="btnCancel" style="display:none">CANCELAR</button>
@@ -192,8 +204,11 @@
             <button class="close-btn" onclick="closeCart()">✕</button>
             <h2>Tu Carrito</h2>
             <div id="cartList" style="margin-top:25px; max-height:40vh; overflow-y:auto;"></div>
-            <h3 style="text-align:right; margin-top:25px; font-size:1.5rem;">Total: <span id="modalTotal">$0</span></h3>
-            <button onclick="finalizeOrder()" class="btn wa-btn" id="waBtn">FINALIZAR PEDIDO POR WHATSAPP</button>
+            <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+                <input type="tel" id="clientPhone" placeholder="📱 Tu celular (Opcional)" style="background:#fff; border:1px solid #ddd;">
+            </div>
+            <h3 style="text-align:right; margin-top:15px; font-size:1.5rem;">Total: <span id="modalTotal">$0</span></h3>
+            <button onclick="finalizeOrder()" class="btn wa-btn" id="waBtn">FINALIZAR PEDIDO</button>
             <button onclick="clearCart()" class="btn-text" style="width:100%; margin-top:15px; color:#999;">Vaciar Carrito</button>
         </div>
     </div>
@@ -223,7 +238,7 @@
 
         let products = [], cart = [], activeCat = 'all';
         let isLoggedIn = false;
-        let selectedVariants = {}; // Almacena la variante seleccionada por producto
+        let selectedVariants = {};
 
         function getCreds() { const s = localStorage.getItem('shop_creds'); return s ? JSON.parse(s) : { u: 'LUCAS', p: 'FAGA' }; }
 
@@ -264,7 +279,7 @@
                 try {
                     const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "uploadImage", image: reader.result.split(',')[1], mimeType: file.type, filename: file.name }) });
                     const data = await res.json();
-                    if(data.result === "success") { document.getElementById('pImg').value = data.url; status.innerText = "✅ Foto lista"; status.style.color = "#34C759"; } else throw new Error();
+                    if(data.result === "success") { document.getElementById('pImg').value = data.url; status.innerText = "✅ Foto lista (lh3)"; status.style.color = "#34C759"; } else throw new Error();
                 } catch(e) { status.innerText = "❌ Error al subir"; status.style.color = "red"; }
             };
         }
@@ -277,24 +292,30 @@
                 const data = await res.json();
                 products = data.products || [];
                 renderCats(); renderGrid('all');
-                checkDeepLink(); // REVISAR SI HAY LINK DIRECTO
+                checkDeepLink(); 
             } catch (err) { alert("Error conectando"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
 
-        // --- NUEVA FUNCIÓN: DEEP LINKING ---
         function checkDeepLink() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
             if (productId) {
                 const productCard = document.getElementById('product-' + productId);
                 if (productCard) {
-                    // Scroll suave hasta el producto
                     productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Añadir clase para efecto de resaltado
                     productCard.classList.add('highlight-card');
-                    // Quitar el efecto después de unos segundos
                     setTimeout(() => { productCard.classList.remove('highlight-card'); }, 3000);
                 }
+            }
+        }
+
+        function shareProduct(id) {
+            const url = window.location.href.split('?')[0] + '?id=' + id;
+            if (navigator.share) {
+                navigator.share({ title: 'Mira este producto', url: url }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(url);
+                alert("Link copiado al portapapeles!");
             }
         }
 
@@ -309,7 +330,7 @@
                 img: img, cat: document.getElementById('pCat').value || "Varios",
                 stock: document.getElementById('pStock').value, 
                 desc: document.getElementById('pDesc').value,
-                vars: document.getElementById('pVars').value // NUEVO CAMPO VARIANTES
+                vars: document.getElementById('pVars').value 
             };
             try { await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }); cancelEdit(); await init(); } catch(e) { alert("Error"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
@@ -321,37 +342,42 @@
 
         function renderCats() {
             const cats = ['Todos', ...new Set(products.map(p => p.cat))];
-            const c = document.getElementById('catContainer'); const sb = document.getElementById('sidebarList');
-            c.innerHTML = ''; sb.innerHTML = '';
+            const c = document.getElementById('catContainer'); const sb = document.getElementById('sidebarList'); const dl = document.getElementById('catDatalist');
+            c.innerHTML = ''; sb.innerHTML = ''; dl.innerHTML = '';
             cats.forEach(x => { 
                 const cls = activeCat===x ? 'active' : '';
                 c.innerHTML += `<div class="cat-pill ${cls}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`;
                 sb.innerHTML += `<div class="sidebar-item ${cls}" onclick="filter('${x==='Todos'?'all':x}'); toggleMenu()">${x}</div>`;
+                if(x!=='Todos') dl.innerHTML += `<option value="${x}">`;
             });
         }
         
         function filter(c) { activeCat=c; renderCats(); renderGrid(c); }
         
+        // --- LOGICA DE CANTIDAD EN CARRITO ---
+        function getQty(id) {
+            return cart.filter(i => i.id == id).length;
+        }
+
         function renderGrid(c) {
             const g = document.getElementById('grid'); g.innerHTML = '';
             const list = c === 'all' ? products : products.filter(p => p.cat === c);
             if(list.length === 0) { g.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#999; margin-top:50px;">Sin productos</p>'; return; }
             list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
-                // LOGICA PARA GENERAR BOTONES DE VARIANTES
+                const qty = getQty(p.id);
+                
                 let variantsHtml = '';
                 if (p.vars) {
                     const varList = p.vars.split(',').map(v => v.trim());
                     variantsHtml = '<div class="variants-wrap">';
-                    varList.forEach(v => {
-                        variantsHtml += `<div class="var-pill" onclick="selectVariant(this, ${p.id}, '${v}')">${v}</div>`;
-                    });
+                    varList.forEach(v => { variantsHtml += `<div class="var-pill" onclick="selectVariant(this, ${p.id}, '${v}')">${v}</div>`; });
                     variantsHtml += '</div>';
                 }
 
-                // Agregamos ID al container de la card para el Deep Linking
                 g.innerHTML += `
                 <div class="card ${!p.hasStock?'no-stock':''}" id="product-${p.id}">
+                    <button class="btn-share" onclick="shareProduct(${p.id})">🔗</button>
                     <div class="card-actions"><button class="act-btn" onclick='editP(${JSON.stringify(p)})'>✏️</button><button class="act-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button></div>
                     <div class="img-wrap">${isPromo?'<span class="badge bg-promo">OFERTA</span>':''}${!p.hasStock?'<span class="badge bg-stock">AGOTADO</span>':''}<img src="${p.img}"></div>
                     <div class="card-info">
@@ -360,21 +386,20 @@
                         ${variantsHtml}
                         <div class="c-footer">
                             <div class="prices">${isPromo ? `<span class="old-p">$${p.price}</span> <span class="promo">$${p.promoPrice}</span>` : `$${p.price}`}</div>
-                            <button class="btn-add" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'+':'✕'}</button>
+                            <button class="btn-add" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>
+                                ${p.hasStock ? '+' : '✕'}
+                                ${qty > 0 ? `<span class="qty-badge">${qty}</span>` : ''}
+                            </button>
                         </div>
                     </div>
                 </div>`;
             });
         }
 
-        // NUEVA FUNCIÓN: SELECCIONAR VARIANTE
         function selectVariant(btn, productId, variantName) {
-            // Quitar selección previa visualmente en este producto
             const parent = btn.parentElement;
             parent.querySelectorAll('.var-pill').forEach(b => b.classList.remove('selected'));
-            // Marcar el nuevo
             btn.classList.add('selected');
-            // Guardar la selección
             selectedVariants[productId] = variantName;
         }
         
@@ -383,7 +408,7 @@
             document.getElementById('editId').value = p.id;
             document.getElementById('pName').value = p.name; document.getElementById('pPrice').value = p.price; document.getElementById('pPromo').value = p.promoPrice||'';
             document.getElementById('pImg').value = p.img; document.getElementById('pCat').value = p.cat; document.getElementById('pStock').value = p.hasStock?'SI':'NO'; document.getElementById('pDesc').value = p.desc || ''; 
-            document.getElementById('pVars').value = p.vars || ''; // Cargar variantes al editar
+            document.getElementById('pVars').value = p.vars || ''; 
             document.getElementById('uploadStatus').innerText = "✅ Foto OK"; document.getElementById('btnSave').innerText = "Actualizar"; document.getElementById('btnCancel').style.display = 'block';
             document.getElementById('mainBody').classList.add('admin-visible'); window.scrollTo(0,0);
         }
@@ -394,32 +419,20 @@
             document.getElementById('uploadStatus').innerText = "Sube una foto";
         }
         
-        // LOGICA CARRITO MODIFICADA PARA VARIANTES
         function addCart(id) { 
             const p = products.find(x=>x.id==id); 
             if(p && p.hasStock){ 
-                // Verificar si requiere variante y si se seleccionó
-                if (p.vars && !selectedVariants[id]) {
-                    alert("Por favor, selecciona una opción (Talle/Color) antes de agregar.");
-                    return;
-                }
-                
-                // Crear un item para el carrito (clonando el producto)
+                if (p.vars && !selectedVariants[id]) return alert("Elige una opción primero.");
                 let cartItem = {...p};
-                // Si tiene variante seleccionada, modificar el nombre para el carrito
                 if (selectedVariants[id]) {
                     cartItem.name = `${p.name} (${selectedVariants[id]})`;
-                    // Limpiar selección después de agregar
                     delete selectedVariants[id];
-                    // Resetear visualmente los botones
                     const productCard = document.getElementById('product-' + id);
-                    if(productCard) {
-                        productCard.querySelectorAll('.var-pill').forEach(b => b.classList.remove('selected'));
-                    }
+                    if(productCard) productCard.querySelectorAll('.var-pill').forEach(b => b.classList.remove('selected'));
                 }
-
                 cart.push(cartItem); 
                 updateCart(); 
+                renderGrid(activeCat); // Re-render para actualizar el contador en el botón
             } 
         }
 
@@ -431,55 +444,45 @@
         }
         function openCart() {
             const l = document.getElementById('cartList'); l.innerHTML = ''; const g = {}; 
-            // Agrupar por nombre exacto (incluyendo la variante)
             cart.forEach(i=>{ if(!g[i.name])g[i.name]={...i,q:0}; g[i.name].q++; });
             Object.values(g).forEach(i=>{ const pr = i.promoPrice||i.price; l.innerHTML+=`<div class="cart-row"><span>${i.name} (x${i.q})</span><b>$${pr*i.q}</b></div>`; });
             document.getElementById('cartModal').style.display='flex';
         }
         function closeCart(){document.getElementById('cartModal').style.display='none';}
-        function clearCart(){cart=[];updateCart();closeCart();}
+        function clearCart(){cart=[];updateCart();closeCart(); renderGrid(activeCat);}
 
-        // NUEVA FUNCIÓN: FINALIZAR PEDIDO (REGISTRA VENTA Y ABRE WA)
         async function finalizeOrder() {
+            const phone = document.getElementById('clientPhone').value;
             const waBtn = document.getElementById('waBtn');
-            waBtn.innerText = "Registrando pedido..."; 
-            waBtn.disabled = true;
+            waBtn.innerText = "Registrando..."; waBtn.disabled = true;
 
-            // 1. Preparar mensaje de WhatsApp y datos para la Hoja
             const g = {}; cart.forEach(i=>{ if(!g[i.name])g[i.name]={...i,q:0}; g[i.name].q++; });
-            let waMsg = "Hola! Quiero pedir:%0A%0A";
+            let waMsg = "Hola! Pedido:%0A%0A";
             let sheetDetails = "";
-            
             Object.values(g).forEach(i=>{ 
                 const pr = i.promoPrice||i.price; 
-                waMsg += `• *${i.q}x ${i.name}*: $${pr*i.q}%0A`; 
-                sheetDetails += `${i.q}x ${i.name} ($${pr*i.q}) | `;
+                waMsg += `• ${i.q}x ${i.name}: $${pr*i.q}%0A`; 
+                sheetDetails += `${i.q}x ${i.name} | `;
             });
-            
             const total = cart.reduce((a,b)=>a+(b.promoPrice||b.price),0);
             waMsg += `%0A💰 *TOTAL: $${total}*`;
+            if(phone) waMsg += `%0A📱 Contacto: ${phone}`;
 
-            // 2. Enviar datos a Google Sheet (CRM) en segundo plano
             try {
                 await fetch(API_URL, {
                     method: "POST",
                     body: JSON.stringify({
                         action: "recordSale",
                         orderDetails: sheetDetails,
-                        total: total
+                        total: total,
+                        phone: phone
                     })
                 });
-            } catch (e) {
-                console.error("Error registrando venta en hoja, pero se abrirá WA", e);
-            }
+            } catch (e) { console.error(e); }
 
-            // 3. Abrir WhatsApp
             window.open(`https://wa.me/${PHONE}?text=${waMsg}`, '_blank');
-            
-            // 4. Limpiar y cerrar
             clearCart();
-            waBtn.innerText = "FINALIZAR PEDIDO POR WHATSAPP"; 
-            waBtn.disabled = false;
+            waBtn.innerText = "FINALIZAR PEDIDO"; waBtn.disabled = false;
         }
 
         init();
