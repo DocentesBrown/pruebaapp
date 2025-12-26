@@ -156,10 +156,13 @@
 
     <script>
         // ==========================================
-        //  TUS DATOS CONFIGURADOS
+        //  CONFIGURACIÓN CONECTADA
         // ==========================================
         
+        // URL EXACTA QUE ME PASASTE:
         const API_URL = "https://script.google.com/macros/s/AKfycbxMUSMKycILcGWQVbUbAy7MtgvvvWhM0-QdlMdp4sXxirDHKz-LvaQgaYuku3Td8puS4Q/exec";
+        
+        // TU CELULAR:
         const PHONE = "5491138614767"; 
 
         // ==========================================
@@ -227,7 +230,7 @@
             document.getElementById('confirmPass').value='';
         }
 
-        // --- SUBIDA A GOOGLE DRIVE (Lógica Nueva) ---
+        // --- SUBIDA A GOOGLE DRIVE ---
         function uploadToDrive() {
             const file = document.getElementById('fileInput').files[0];
             const status = document.getElementById('uploadStatus');
