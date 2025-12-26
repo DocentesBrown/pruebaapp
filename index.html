@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Tienda Online</title>
     <style>
+        /* ESTILOS VISUALES */
         :root { --primary: #008069; --accent: #e53935; --bg: #f4f4f9; --card: #ffffff; --text: #333; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         
@@ -27,11 +28,13 @@
         .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
         .btn-sec { background: #777; }
         
-        .file-upload-wrapper { position: relative; margin-bottom: 10px; border: 2px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #fafafa; transition: 0.3s; }
-        .file-upload-wrapper.uploading { background: #e0f7fa; border-color: var(--primary); }
-        /* Esto permite elegir camara o galeria en moviles */
-        .file-upload-wrapper input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer; }
-        .upload-text { color: #666; font-size: 0.9rem; pointer-events: none; }
+        /* ZONA FOTOS MEJORADA */
+        .photo-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn-photo { flex: 1; padding: 15px; border: 2px dashed #ccc; background: #fafafa; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: #555; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
+        .btn-photo:active { background: #e0f7fa; border-color: var(--primary); transform: scale(0.98); }
+        .btn-photo span { font-size: 1.5rem; }
+
+        .uploading-state { pointer-events: none; opacity: 0.6; background: #e0f7fa !important; border-color: var(--primary) !important; }
 
         .login-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 30px; border-radius: 15px; width: 80%; max-width: 300px; text-align: center; }
@@ -114,11 +117,20 @@
             <input type="number" id="pPromo" placeholder="Promo (Opcional)">
         </div>
 
-        <div class="file-upload-wrapper" id="uploadWrapper">
-            <span id="uploadStatus" class="upload-text">📸 Toca para FOTO (Cámara o Galería)</span>
-            <input type="file" id="fileInput" accept="image/*" onchange="uploadToDrive()">
+        <div class="photo-buttons" id="uploadWrapper">
+            <button class="btn-photo" onclick="document.getElementById('fileInputCam').click()">
+                <span>📸</span> Cámara
+            </button>
+            <button class="btn-photo" onclick="document.getElementById('fileInputGal').click()">
+                <span>📁</span> Galería
+            </button>
         </div>
-        <input type="text" id="pImg" placeholder="Link..." style="font-size:12px; color:#666; background:#eee;" readonly>
+        <div id="uploadStatus" style="text-align:center; font-size:0.8rem; margin-bottom:10px; color:#666;">Selecciona una opción</div>
+
+        <input type="file" id="fileInputCam" accept="image/*" capture="environment" onchange="uploadToDrive(this)" style="display:none;">
+        <input type="file" id="fileInputGal" accept="image/*" onchange="uploadToDrive(this)" style="display:none;">
+        
+        <input type="text" id="pImg" placeholder="Link de imagen..." style="font-size:12px; color:#666; background:#eee;" readonly>
 
         <div class="form-row">
             <input type="text" id="pCat" placeholder="Categoría" list="catDatalist">
@@ -187,14 +199,21 @@
             document.getElementById('oldPass').value=''; document.getElementById('newPass').value=''; document.getElementById('confirmPass').value='';
         }
 
-        function uploadToDrive() {
-            const file = document.getElementById('fileInput').files[0];
+        // FUNCIÓN DE SUBIDA ADAPTADA A DOS BOTONES
+        function uploadToDrive(inputElement) {
+            const file = inputElement.files[0];
             const status = document.getElementById('uploadStatus');
-            const wrapper = document.getElementById('uploadWrapper');
+            const btns = document.querySelectorAll('.btn-photo');
+            
             if(!file) return;
             if(file.size > 5 * 1024 * 1024) return alert("Máximo 5MB.");
 
-            status.innerText = "⏳ Subiendo..."; status.style.fontWeight = "bold"; wrapper.classList.add('uploading');
+            status.innerText = "⏳ Subiendo a Drive..."; 
+            status.style.fontWeight = "bold"; 
+            status.style.color = "var(--primary)";
+            
+            // Efecto visual de carga
+            btns.forEach(b => b.classList.add('uploading-state'));
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -206,10 +225,12 @@
                     const data = await res.json();
                     if(data.result === "success") {
                         document.getElementById('pImg').value = data.url;
-                        status.innerText = "✅ Foto OK"; status.style.color = "green"; wrapper.classList.remove('uploading');
+                        status.innerText = "✅ Foto guardada en Drive"; status.style.color = "green"; 
                     } else throw new Error(data.message);
                 } catch(e) {
-                    status.innerText = "❌ Error"; status.style.color = "red"; wrapper.classList.remove('uploading'); alert("Error subiendo: " + e);
+                    status.innerText = "❌ Error al subir"; status.style.color = "red"; alert("Error: " + e);
+                } finally {
+                    btns.forEach(b => b.classList.remove('uploading-state'));
                 }
             };
         }
@@ -239,7 +260,7 @@
                 name: name, price: price, promo: document.getElementById('pPromo').value,
                 img: imgVal, cat: document.getElementById('pCat').value || "Varios",
                 stock: document.getElementById('pStock').value,
-                desc: document.getElementById('pDesc').value // NUEVO CAMPO
+                desc: document.getElementById('pDesc').value 
             };
 
             showLoader(true, "Guardando...");
@@ -303,9 +324,9 @@
             document.getElementById('pImg').value = p.img;
             document.getElementById('pCat').value = p.cat;
             document.getElementById('pStock').value = p.hasStock?'SI':'NO';
-            document.getElementById('pDesc').value = p.desc || ''; // Cargar descripción
+            document.getElementById('pDesc').value = p.desc || ''; 
             
-            document.getElementById('uploadStatus').innerText = "✅ Foto OK en Drive";
+            document.getElementById('uploadStatus').innerText = "✅ Foto guardada en Drive";
             document.getElementById('uploadStatus').style.color = "green";
             document.getElementById('btnSave').innerText = "Actualizar";
             document.getElementById('btnCancel').style.display = 'block';
@@ -320,8 +341,9 @@
             document.getElementById('pPromo').value = '';
             document.getElementById('pImg').value = '';
             document.getElementById('pDesc').value = '';
-            document.getElementById('fileInput').value = "";
-            document.getElementById('uploadStatus').innerText = "📸 Toca para FOTO";
+            document.getElementById('fileInputCam').value = "";
+            document.getElementById('fileInputGal').value = "";
+            document.getElementById('uploadStatus').innerText = "Selecciona una opción";
             document.getElementById('uploadStatus').style.color = "#666";
             document.getElementById('btnSave').innerText = "Guardar";
             document.getElementById('btnCancel').style.display = 'none';
