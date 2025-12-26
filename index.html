@@ -6,17 +6,41 @@
     <title>Mi Tienda Online</title>
     <style>
         /* ESTILOS VISUALES */
-        :root { --primary: #008069; --accent: #e53935; --bg: #f4f4f9; --card: #ffffff; --text: #333; }
+        :root { --primary: #008069; --accent: #e53935; --bg: #f4f4f9; --card: #ffffff; --text: #333; --sidebar-width: 280px; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         
-        header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .brand { font-weight: 800; font-size: 1.2rem; }
+        /* HEADER MEJORADO */
+        header { background: var(--primary); color: white; padding: 10px 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: 50px; }
+        .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; }
+        .brand { font-weight: 800; font-size: 1.2rem; flex-grow: 1; }
         .admin-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
 
+        /* MENU LATERAL (SIDEBAR) */
+        .sidebar { position: fixed; top: 0; left: calc(var(--sidebar-width) * -1); width: var(--sidebar-width); height: 100%; background: white; z-index: 2000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .sidebar.open { left: 0; }
+        
+        .sidebar-header { background: var(--primary); color: white; padding: 20px; font-weight: bold; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
+        .close-menu { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        
+        .sidebar-content { flex-grow: 1; overflow-y: auto; padding: 20px 0; }
+        .sidebar-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 1rem; color: #444; transition: 0.2s; }
+        .sidebar-item:hover, .sidebar-item.active { background: #f0f7f6; color: var(--primary); font-weight: bold; }
+        
+        .sidebar-footer { padding: 20px; background: #f9f9f9; border-top: 1px solid #ddd; }
+        .contact-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #333; margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px; border: 1px solid #ddd; font-weight: 500; }
+        .contact-link.wa { color: #25D366; border-color: #25D366; }
+        .contact-link.ig { color: #E1306C; border-color: #E1306C; }
+
+        /* OVERLAY (FONDO OSCURO) */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1999; display: none; opacity: 0; transition: opacity 0.3s; }
+        .menu-overlay.open { display: block; opacity: 1; }
+
+        /* LOADER */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; }
         .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* ADMIN */
         #adminPanel { display: none; background: white; padding: 20px; border-bottom: 2px solid #ddd; animation: slideDown 0.3s; }
         .admin-visible #adminPanel { display: block; }
         @keyframes slideDown { from {transform: translateY(-20px); opacity:0;} to {transform: translateY(0); opacity:1;} }
@@ -28,19 +52,19 @@
         .btn-main { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
         .btn-sec { background: #777; }
         
-        /* ZONA FOTOS MEJORADA */
         .photo-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
         .btn-photo { flex: 1; padding: 15px; border: 2px dashed #ccc; background: #fafafa; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: #555; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
         .btn-photo:active { background: #e0f7fa; border-color: var(--primary); transform: scale(0.98); }
         .btn-photo span { font-size: 1.5rem; }
-
         .uploading-state { pointer-events: none; opacity: 0.6; background: #e0f7fa !important; border-color: var(--primary) !important; }
 
+        /* LOGIN */
         .login-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 30px; border-radius: 15px; width: 80%; max-width: 300px; text-align: center; }
         .link-btn { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 10px; font-size: 0.8rem; }
 
-        .cat-bar { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: var(--bg); }
+        /* GRILLA Y CATEGORIAS HORIZONTALES (Opcional mantenerlas) */
+        .cat-bar { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: var(--bg); border-bottom: 1px solid #eee; }
         .cat-pill { background: white; padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; white-space: nowrap; cursor: pointer; }
         .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
 
@@ -67,6 +91,7 @@
         .desc-text { font-size: 0.8rem; color: #666; margin-bottom: 10px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .buy-btn { margin-top: auto; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
         
+        /* CARRITO FLOTANTE */
         .cart-fab { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 12px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 500; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
         .modal-body { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 80vh; overflow-y: auto; }
@@ -80,9 +105,28 @@
     <div id="loader"><div class="spinner"></div><p id="loaderMsg" style="margin-top:20px; color:#666; font-size:0.9rem;">Cargando...</p></div>
 
     <header>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
         <div class="brand">Mi Tienda</div>
         <button class="admin-btn" onclick="checkLoginAccess()">🔒 Admin</button>
     </header>
+
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span>Categorías</span>
+            <button class="close-menu" onclick="toggleMenu()">✕</button>
+        </div>
+        <div class="sidebar-content" id="sidebarList">
+            </div>
+        <div class="sidebar-footer">
+            <a href="#" class="contact-link wa" id="waContact" target="_blank">
+                <span>💬 WhatsApp</span>
+            </a>
+            <a href="#" class="contact-link ig" id="igContact" target="_blank">
+                <span>📷 Instagram</span>
+            </a>
+        </div>
+    </div>
 
     <div class="login-overlay" id="loginModal">
         <div class="login-box" id="loginFormBox">
@@ -118,12 +162,8 @@
         </div>
 
         <div class="photo-buttons" id="uploadWrapper">
-            <button class="btn-photo" onclick="document.getElementById('fileInputCam').click()">
-                <span>📸</span> Cámara
-            </button>
-            <button class="btn-photo" onclick="document.getElementById('fileInputGal').click()">
-                <span>📁</span> Galería
-            </button>
+            <button class="btn-photo" onclick="document.getElementById('fileInputCam').click()"><span>📸</span> Cámara</button>
+            <button class="btn-photo" onclick="document.getElementById('fileInputGal').click()"><span>📁</span> Galería</button>
         </div>
         <div id="uploadStatus" style="text-align:center; font-size:0.8rem; margin-bottom:10px; color:#666;">Selecciona una opción</div>
 
@@ -162,12 +202,24 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxMUSMKycILcGWQVbUbAy7MtgvvvWhM0-QdlMdp4sXxirDHKz-LvaQgaYuku3Td8puS4Q/exec";
         const PHONE = "5491138614767"; 
+        
+        // ============================================
+        //  👇 PON TU INSTAGRAM AQUI 👇
+        const INSTAGRAM_URL = "https://instagram.com/TU_USUARIO_AQUI"; 
+        // ============================================
 
         let products = [], cart = [], activeCat = 'all';
         let isLoggedIn = false;
 
         function getCreds() { const s = localStorage.getItem('shop_creds'); return s ? JSON.parse(s) : { u: 'LUCAS', p: 'FAGA' }; }
         
+        // MENÚ LATERAL
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('menuOverlay').classList.toggle('open');
+        }
+
+        // LOGIN
         function checkLoginAccess() { 
             if (isLoggedIn) document.getElementById('mainBody').classList.toggle('admin-visible');
             else {
@@ -176,73 +228,47 @@
                 document.getElementById('changePassBox').style.display='none';
             }
         }
-        
         function doLogin() {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
-            const c = getCreds();
-            if (u === c.u && p === c.p) { 
-                isLoggedIn = true; closeLogin(); 
-                document.getElementById('mainBody').classList.add('admin-visible'); 
-                document.getElementById('loginUser').value=''; document.getElementById('loginPass').value=''; 
-            } else alert("Datos incorrectos");
+            const u = document.getElementById('loginUser').value, p = document.getElementById('loginPass').value, c = getCreds();
+            if (u === c.u && p === c.p) { isLoggedIn = true; closeLogin(); document.getElementById('mainBody').classList.add('admin-visible'); } else alert("Datos incorrectos");
         }
         function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
         function logout() { isLoggedIn = false; document.getElementById('mainBody').classList.remove('admin-visible'); alert("Sesión cerrada"); }
         function togglePassMode(show) { document.getElementById('loginFormBox').style.display = show?'none':'block'; document.getElementById('changePassBox').style.display = show?'block':'none'; }
-        
         function saveNewPass() {
             const o = document.getElementById('oldPass').value, n = document.getElementById('newPass').value, c = document.getElementById('confirmPass').value, r = getCreds();
             if (o !== r.p) return alert("Clave actual mal"); if (n !== c) return alert("No coinciden"); if (n.length<4) return alert("Muy corta");
-            localStorage.setItem('shop_creds', JSON.stringify({ u: 'LUCAS', p: n })); 
-            alert("Listo!"); closeLogin();
-            document.getElementById('oldPass').value=''; document.getElementById('newPass').value=''; document.getElementById('confirmPass').value='';
+            localStorage.setItem('shop_creds', JSON.stringify({ u: 'LUCAS', p: n })); alert("Listo!"); closeLogin();
         }
 
-        // FUNCIÓN DE SUBIDA ADAPTADA A DOS BOTONES
+        // FOTOS
         function uploadToDrive(inputElement) {
-            const file = inputElement.files[0];
-            const status = document.getElementById('uploadStatus');
-            const btns = document.querySelectorAll('.btn-photo');
-            
-            if(!file) return;
-            if(file.size > 5 * 1024 * 1024) return alert("Máximo 5MB.");
-
-            status.innerText = "⏳ Subiendo a Drive..."; 
-            status.style.fontWeight = "bold"; 
-            status.style.color = "var(--primary)";
-            
-            // Efecto visual de carga
+            const file = inputElement.files[0]; const status = document.getElementById('uploadStatus'); const btns = document.querySelectorAll('.btn-photo');
+            if(!file) return; if(file.size > 5 * 1024 * 1024) return alert("Máximo 5MB.");
+            status.innerText = "⏳ Subiendo..."; status.style.fontWeight = "bold"; status.style.color = "var(--primary)";
             btns.forEach(b => b.classList.add('uploading-state'));
 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
+            const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = async function() {
                 const base64Content = reader.result.split(',')[1]; 
-                const payload = { action: "uploadImage", image: base64Content, mimeType: file.type, filename: file.name };
                 try {
-                    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+                    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "uploadImage", image: base64Content, mimeType: file.type, filename: file.name }) });
                     const data = await res.json();
-                    if(data.result === "success") {
-                        document.getElementById('pImg').value = data.url;
-                        status.innerText = "✅ Foto guardada en Drive"; status.style.color = "green"; 
-                    } else throw new Error(data.message);
-                } catch(e) {
-                    status.innerText = "❌ Error al subir"; status.style.color = "red"; alert("Error: " + e);
-                } finally {
-                    btns.forEach(b => b.classList.remove('uploading-state'));
-                }
+                    if(data.result === "success") { document.getElementById('pImg').value = data.url; status.innerText = "✅ Foto guardada"; status.style.color = "green"; } else throw new Error(data.message);
+                } catch(e) { status.innerText = "❌ Error"; status.style.color = "red"; alert("Error: " + e); } finally { btns.forEach(b => b.classList.remove('uploading-state')); }
             };
         }
 
+        // LOGICA TIENDA
         async function init() {
             showLoader(true, "Conectando...");
+            document.getElementById('waContact').href = `https://wa.me/${PHONE}`;
+            document.getElementById('igContact').href = INSTAGRAM_URL;
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
                 products = data.products || [];
-                renderCats();
-                renderGrid('all');
+                renderCats(); renderGrid('all');
             } catch (err) { console.error(err); alert("Error de conexión"); } finally { showLoader(false); }
         }
 
@@ -250,29 +276,20 @@
             const imgVal = document.getElementById('pImg').value;
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
-
-            if (!name || !price) return alert("Falta nombre o precio");
-            if (!imgVal) return alert("Falta la foto");
-            
+            if (!name || !price) return alert("Falta nombre o precio"); if (!imgVal) return alert("Falta la foto");
             const payload = {
                 action: document.getElementById('editId').value ? "edit" : "add",
                 id: document.getElementById('editId').value || Date.now(),
                 name: name, price: price, promo: document.getElementById('pPromo').value,
                 img: imgVal, cat: document.getElementById('pCat').value || "Varios",
-                stock: document.getElementById('pStock').value,
-                desc: document.getElementById('pDesc').value 
+                stock: document.getElementById('pStock').value, desc: document.getElementById('pDesc').value 
             };
-
             showLoader(true, "Guardando...");
-            try {
-                await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-                cancelEdit(); await init(); alert("Guardado!");
-            } catch (err) { alert("Error al guardar"); } finally { showLoader(false); }
+            try { await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }); cancelEdit(); await init(); alert("Guardado!"); } catch (err) { alert("Error al guardar"); } finally { showLoader(false); }
         }
 
         async function deleteProduct(id) {
-            if(!confirm("¿Borrar?")) return;
-            showLoader(true, "Borrando...");
+            if(!confirm("¿Borrar?")) return; showLoader(true, "Borrando...");
             try { await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) }); await init(); } catch(e) { alert("Error"); } finally { showLoader(false); }
         }
 
@@ -280,9 +297,19 @@
         
         function renderCats() {
             const cats = ['Todos', ...new Set(products.map(p => p.cat))];
-            const c = document.getElementById('catContainer'); const dl = document.getElementById('catDatalist');
-            c.innerHTML = ''; dl.innerHTML = '';
-            cats.forEach(x => { c.innerHTML += `<div class="cat-pill ${activeCat===x?'active':''}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`; if(x!=='Todos') dl.innerHTML += `<option value="${x}">`; });
+            const c = document.getElementById('catContainer'); const dl = document.getElementById('catDatalist'); const sb = document.getElementById('sidebarList');
+            c.innerHTML = ''; dl.innerHTML = ''; sb.innerHTML = '';
+            
+            cats.forEach(x => { 
+                const isActive = activeCat === x;
+                const cls = isActive ? 'active' : '';
+                // Horizontal
+                c.innerHTML += `<div class="cat-pill ${cls}" onclick="filter('${x==='Todos'?'all':x}')">${x}</div>`;
+                // Sidebar
+                sb.innerHTML += `<div class="sidebar-item ${cls}" onclick="filter('${x==='Todos'?'all':x}'); toggleMenu()">${x}</div>`;
+                
+                if(x!=='Todos') dl.innerHTML += `<option value="${x}">`; 
+            });
         }
         
         function filter(c) { activeCat=c; renderCats(); renderGrid(c); }
@@ -291,26 +318,13 @@
             const g = document.getElementById('grid'); g.innerHTML = '';
             const list = c === 'all' ? products : products.filter(p => p.cat === c);
             if(list.length === 0) { g.innerHTML = '<p style="text-align:center;width:100%;color:#888;">Vacío</p>'; return; }
-
             list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
                 g.innerHTML += `
                 <div class="card ${!p.hasStock?'no-stock':''}">
-                    <div class="card-actions">
-                        <button class="act-btn" onclick='editP(${JSON.stringify(p)})'>✏️</button>
-                        <button class="act-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button>
-                    </div>
-                    <div class="img-box">
-                        ${isPromo?'<span class="badge bg-promo">OFERTA</span>':''}
-                        ${!p.hasStock?'<span class="badge bg-stock">AGOTADO</span>':''}
-                        <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Error'">
-                    </div>
-                    <div class="info">
-                        <div style="font-weight:bold; margin-bottom:5px;">${p.name}</div>
-                        ${p.desc ? `<div class="desc-text">${p.desc}</div>` : ''}
-                        <div class="prices">${isPromo ? `<span class="old">$${p.price}</span> <span class="curr promo">$${p.promoPrice}</span>` : `<span class="curr">$${p.price}</span>`}</div>
-                        <button class="buy-btn" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'AGREGAR':'SIN STOCK'}</button>
-                    </div>
+                    <div class="card-actions"><button class="act-btn" onclick='editP(${JSON.stringify(p)})'>✏️</button><button class="act-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button></div>
+                    <div class="img-box">${isPromo?'<span class="badge bg-promo">OFERTA</span>':''}${!p.hasStock?'<span class="badge bg-stock">AGOTADO</span>':''}<img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Error'"></div>
+                    <div class="info"><div style="font-weight:bold; margin-bottom:5px;">${p.name}</div>${p.desc ? `<div class="desc-text">${p.desc}</div>` : ''}<div class="prices">${isPromo ? `<span class="old">$${p.price}</span> <span class="curr promo">$${p.promoPrice}</span>` : `<span class="curr">$${p.price}</span>`}</div><button class="buy-btn" onclick="addCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'AGREGAR':'SIN STOCK'}</button></div>
                 </div>`;
             });
         }
@@ -318,51 +332,29 @@
         function editP(p) {
             if(!isLoggedIn) return checkLoginAccess();
             document.getElementById('editId').value = p.id;
-            document.getElementById('pName').value = p.name;
-            document.getElementById('pPrice').value = p.price;
-            document.getElementById('pPromo').value = p.promoPrice||'';
-            document.getElementById('pImg').value = p.img;
-            document.getElementById('pCat').value = p.cat;
-            document.getElementById('pStock').value = p.hasStock?'SI':'NO';
-            document.getElementById('pDesc').value = p.desc || ''; 
-            
-            document.getElementById('uploadStatus').innerText = "✅ Foto guardada en Drive";
-            document.getElementById('uploadStatus').style.color = "green";
-            document.getElementById('btnSave').innerText = "Actualizar";
-            document.getElementById('btnCancel').style.display = 'block';
-            document.getElementById('formTitle').innerText = "Editar";
+            document.getElementById('pName').value = p.name; document.getElementById('pPrice').value = p.price; document.getElementById('pPromo').value = p.promoPrice||'';
+            document.getElementById('pImg').value = p.img; document.getElementById('pCat').value = p.cat; document.getElementById('pStock').value = p.hasStock?'SI':'NO'; document.getElementById('pDesc').value = p.desc || ''; 
+            document.getElementById('uploadStatus').innerText = "✅ Foto OK en Drive"; document.getElementById('uploadStatus').style.color = "green";
+            document.getElementById('btnSave').innerText = "Actualizar"; document.getElementById('btnCancel').style.display = 'block'; document.getElementById('formTitle').innerText = "Editar";
             window.scrollTo(0,0);
         }
         
         function cancelEdit() {
-            document.getElementById('editId').value = '';
-            document.getElementById('pName').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('pPromo').value = '';
-            document.getElementById('pImg').value = '';
-            document.getElementById('pDesc').value = '';
-            document.getElementById('fileInputCam').value = "";
-            document.getElementById('fileInputGal').value = "";
-            document.getElementById('uploadStatus').innerText = "Selecciona una opción";
-            document.getElementById('uploadStatus').style.color = "#666";
-            document.getElementById('btnSave').innerText = "Guardar";
-            document.getElementById('btnCancel').style.display = 'none';
-            document.getElementById('formTitle').innerText = "Nuevo";
+            document.getElementById('editId').value = ''; document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pPromo').value = '';
+            document.getElementById('pImg').value = ''; document.getElementById('pDesc').value = ''; document.getElementById('fileInputCam').value = ""; document.getElementById('fileInputGal').value = "";
+            document.getElementById('uploadStatus').innerText = "Selecciona una opción"; document.getElementById('uploadStatus').style.color = "#666";
+            document.getElementById('btnSave').innerText = "Guardar"; document.getElementById('btnCancel').style.display = 'none'; document.getElementById('formTitle').innerText = "Nuevo";
         }
         
         function addCart(id) { const p = products.find(x=>x.id==id); if(p&&p.hasStock){ cart.push(p); updateCart(); } }
         function updateCart() {
             const t = cart.reduce((a,b)=>a+(b.promoPrice||b.price),0);
-            document.getElementById('cartCount').innerText = cart.length; 
-            document.getElementById('cartTotal').innerText = '$'+t; 
-            document.getElementById('modalTotal').innerText = '$'+t;
+            document.getElementById('cartCount').innerText = cart.length; document.getElementById('cartTotal').innerText = '$'+t; document.getElementById('modalTotal').innerText = '$'+t;
             document.getElementById('cartBtn').style.display = cart.length?'flex':'none';
         }
         function openCart() {
-            const l = document.getElementById('cartList'); l.innerHTML = '';
-            const g = {}; cart.forEach(i=>{ if(!g[i.id])g[i.id]={...i,q:0}; g[i.id].q++; });
-            let msg = "👋 Hola! Pedido:%0A%0A";
-            Object.values(g).forEach(i=>{ const pr = i.promoPrice||i.price; l.innerHTML+=`<div class="cart-row"><span>${i.name} (x${i.q})</span><b>$${pr*i.q}</b></div>`; msg+=`• *${i.q}x ${i.name}*: $${pr*i.q}%0A`; });
+            const l = document.getElementById('cartList'); l.innerHTML = ''; const g = {}; cart.forEach(i=>{ if(!g[i.id])g[i.id]={...i,q:0}; g[i.id].q++; });
+            let msg = "👋 Hola! Pedido:%0A%0A"; Object.values(g).forEach(i=>{ const pr = i.promoPrice||i.price; l.innerHTML+=`<div class="cart-row"><span>${i.name} (x${i.q})</span><b>$${pr*i.q}</b></div>`; msg+=`• *${i.q}x ${i.name}*: $${pr*i.q}%0A`; });
             msg+=`%0ATotal: $${cart.reduce((a,b)=>a+(b.promoPrice||b.price),0)}`;
             document.getElementById('waLink').href=`https://wa.me/${PHONE}?text=${msg}`;
             document.getElementById('cartModal').style.display='flex';
