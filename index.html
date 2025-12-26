@@ -3,112 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Digital</title>
+    <title>Catálogo en Vivo</title>
     <style>
         :root { --primary: #008069; --accent: #e53935; --bg: #f0f2f5; --card: #ffffff; --text: #333; }
         body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+        header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center;}
+        .store-name { font-size: 1.4rem; font-weight: bold; }
         
-        /* HEADER */
-        header { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .store-name { font-size: 1.2rem; font-weight: bold; }
-        .admin-toggle { font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 20px; cursor: pointer; border: none; color: white; }
-
-        /* ADMIN PANEL */
-        #adminPanel { display: none; background: #fff; padding: 20px; border-bottom: 2px solid #ddd; }
-        .admin-visible #adminPanel { display: block; }
+        .loading { text-align: center; margin-top: 50px; color: #666; font-style: italic; }
         
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #eee; padding: 10px; border-radius: 8px; }
-        .btn-save { background: #333; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
-        .btn-cancel { background: #999; }
-        .btn-export { background: #0056b3; margin-top: 15px; }
-
-        /* EXPORT BOX */
-        #exportBox { display: none; margin-top: 15px; background: #eef; padding: 15px; border-radius: 8px; border: 1px solid #ccd; }
-        #exportText { width: 100%; height: 80px; font-size: 10px; color: #555; }
-
         /* CATEGORÍAS */
         .cat-scroll { display: flex; overflow-x: auto; padding: 15px 10px; gap: 10px; background: var(--bg); white-space: nowrap; }
-        .cat-btn { padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #ddd; cursor: pointer; transition: 0.2s; }
+        .cat-btn { padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #ddd; cursor: pointer; }
         .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
 
         /* GRILLA */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative; display: flex; flex-direction: column; }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
         .card.no-stock { opacity: 0.6; filter: grayscale(100%); pointer-events: none; }
-        .card.no-stock .admin-actions { pointer-events: auto; filter: grayscale(0%); }
         
         .card-img-container { position: relative; width: 100%; height: 160px; }
         .card-img { width: 100%; height: 100%; object-fit: cover; background: #eee; }
-        .badge { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; color: white; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        .badge { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; color: white; font-size: 0.7rem; font-weight: bold; }
         .badge-promo { background: var(--accent); }
-        .badge-stock { background: #555; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; padding: 10px 20px; border-radius: 8px; z-index: 10; }
-
-        .admin-actions { position: absolute; top: 5px; right: 5px; display: none; z-index: 20; gap: 5px; }
-        .admin-visible .admin-actions { display: flex; }
-        .action-btn { width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-edit { background: white; } .btn-del { background: #ff4444; color: white; }
+        .badge-stock { background: #555; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; padding: 10px 20px; border-radius: 8px; }
 
         .card-body { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
         .card-title { font-weight: 600; margin: 0 0 5px 0; font-size: 0.95rem; }
-        .price-container { margin-bottom: 10px; }
         .price-old { text-decoration: line-through; color: #999; font-size: 0.8rem; margin-right: 5px; }
         .price-curr { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
         .price-promo { color: var(--accent); }
         
         .add-btn { background: var(--primary); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; margin-top: auto; cursor: pointer; font-weight: 500; }
-        .add-btn:active { transform: scale(0.98); }
 
         /* CARRITO */
-        .cart-float { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 15px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 200; transition: transform 0.2s; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; justify-content: center; align-items: flex-end; backdrop-filter: blur(2px); }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 85vh; overflow-y: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); }
+        .cart-float { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 15px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; width: 85%; max-width: 350px; justify-content: space-between; z-index: 200; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; justify-content: center; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 85vh; overflow-y: auto; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .btn-whatsapp { background: #25D366; color: white; text-align: center; padding: 15px; border-radius: 12px; display: block; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 1.1rem; }
     </style>
 </head>
-<body id="appBody">
+<body>
 
     <header>
-        <div class="store-name" id="storeTitle">Mi Tienda</div>
-        <button class="admin-toggle" onclick="toggleAdmin()">⚙️ Admin</button>
+        <div class="store-name">Mi Tienda Online</div>
     </header>
 
-    <div id="adminPanel">
-        <h3 id="formTitle">Agregar Producto</h3>
-        <input type="hidden" id="editId">
-        <input type="text" id="prodName" placeholder="Nombre del producto">
-        <div class="form-grid">
-            <input type="number" id="prodPrice" placeholder="Precio ($)">
-            <input type="number" id="prodPromo" placeholder="Precio Promo (Opcional)">
-        </div>
-        <input type="text" id="prodImg" placeholder="URL Imagen (https://...)">
-        <div class="form-grid">
-            <input type="text" id="prodCat" placeholder="Categoría" list="catList">
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="prodStock" checked> <label for="prodStock">¿Hay Stock?</label>
-            </div>
-        </div>
-        <datalist id="catList"></datalist>
-
-        <button class="btn-save" onclick="saveProduct()" id="btnSave">Guardar Producto</button>
-        <button class="btn-save btn-cancel" onclick="resetForm()" id="btnCancel" style="display:none">Cancelar</button>
-        
-        <hr>
-        <h3>Configuración</h3>
-        <input type="text" id="configStoreName" placeholder="Nombre del Negocio">
-        <input type="text" id="configPhone" placeholder="WhatsApp (Ej: 5491122334455)">
-        <button class="btn-save" onclick="saveConfig()">Guardar Configuración</button>
-
-        <hr>
-        <button class="btn-save btn-export" onclick="exportData()">📤 OBTENER CÓDIGO PARA COMPARTIR</button>
-        <div id="exportBox">
-            <p style="margin-top:0; font-size:12px; font-weight:bold; color:var(--primary);">1. Copia este texto.<br>2. Abre este archivo HTML con el Bloc de Notas.<br>3. Pégalo donde dice "PEGAR AQUI".</p>
-            <textarea id="exportText" readonly></textarea>
-            <button class="btn-save" onclick="copyToClipboard()" style="margin-top:5px; background:#444;">Copiar Texto</button>
-        </div>
-    </div>
+    <div id="loading" class="loading">⏳ Conectando con tu catálogo...</div>
 
     <div class="cat-scroll" id="catContainer"></div>
     <div class="grid" id="productGrid"></div>
@@ -128,140 +70,69 @@
     </div>
 
     <script>
-        // ==========================================
-        //  👇👇👇 ZONA DE DATOS COMPARTIDOS 👇👇👇
-        //  Pega el código generado entre las comillas:
-        const DATOS_COMPARTIDOS = null; 
-        // ==========================================
-
-        let products = [], config = { name: "Mi Tienda", phone: "" }, cart = [], activeCategory = 'all';
-
-        function init() {
-            // Lógica inteligente: Si hay datos compartidos (hardcoded), úsalos. Si no, usa localStorage (modo creador).
-            if (DATOS_COMPARTIDOS) {
-                products = DATOS_COMPARTIDOS.products;
-                config = DATOS_COMPARTIDOS.config;
-                // Ocultar admin para el cliente final (opcional)
-                // document.querySelector('.admin-toggle').style.display = 'none';
-            } else {
-                products = JSON.parse(localStorage.getItem('shopProducts_v3')) || [];
-                config = JSON.parse(localStorage.getItem('shopConfig_v3')) || { name: "Mi Tienda", phone: "" };
-            }
-
-            document.getElementById('storeTitle').innerText = config.name;
-            document.getElementById('configStoreName').value = config.name;
-            document.getElementById('configPhone').value = config.phone;
-            renderCategories();
-            renderProducts('all');
-        }
-
-        /* --- EXPORTAR --- */
-        function exportData() {
-            const data = { products, config };
-            const json = JSON.stringify(data);
-            
-            document.getElementById('exportBox').style.display = 'block';
-            document.getElementById('exportText').value = json;
-        }
-
-        function copyToClipboard() {
-            const copyText = document.getElementById("exportText");
-            copyText.select();
-            document.execCommand("copy");
-            alert("¡Código copiado! Ahora abre este archivo con el Bloc de Notas y pégalo donde dice 'const DATOS_COMPARTIDOS = null', reemplazando el 'null'.");
-        }
-
-        /* --- CORE --- */
-        function toggleAdmin() { document.getElementById('appBody').classList.toggle('admin-visible'); }
+        // ======================================================
+        //  TUS DATOS
+        // ======================================================
         
-        function saveData() {
-            // Solo guardamos en localStorage si NO estamos en modo compartido
-            if (!DATOS_COMPARTIDOS) {
-                localStorage.setItem('shopProducts_v3', JSON.stringify(products));
-                localStorage.setItem('shopConfig_v3', JSON.stringify(config));
-            } else {
-                alert("Estás en modo 'Cliente'. Los cambios no se guardarán permanentemente porque estás usando un archivo compartido.");
+        // 1. TU HOJA DE GOOGLE (Ya integrada)
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIeeh6NdE-R9juaWpgnQdZgy5ArrQKZ_A_nDJ2tMV9hjskZ0bp0FJeZHpQzM8a5S03tq-u5J2pLBVS/pub?output=csv";
+        
+        // 2. TU NÚMERO DE WHATSAPP (¡CÁMBIALO!)
+        // Formato: 549 + Area + Numero. Ejemplo: 5491122334455
+        const PHONE_NUMBER = "5491122334455"; 
+
+        // ======================================================
+
+        let products = [];
+        let cart = [];
+        let activeCategory = 'all';
+
+        async function init() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const text = await response.text();
+                products = parseCSV(text);
+                
+                document.getElementById('loading').style.display = 'none';
+                renderCategories();
+                renderProducts('all');
+
+            } catch (error) {
+                document.getElementById('loading').innerText = "Hubo un error al leer la hoja de cálculo. Verifica que esté publicada en la Web.";
+                console.error(error);
             }
         }
 
-        function saveConfig() {
-            config.name = document.getElementById('configStoreName').value;
-            config.phone = document.getElementById('configPhone').value;
-            saveData();
-            document.getElementById('storeTitle').innerText = config.name;
-            alert("Configuración local guardada. Recuerda EXPORTAR si quieres compartirla.");
-        }
-
-        function saveProduct() {
-            const idInput = document.getElementById('editId').value;
-            const name = document.getElementById('prodName').value;
-            const price = parseFloat(document.getElementById('prodPrice').value);
-            const promo = document.getElementById('prodPromo').value ? parseFloat(document.getElementById('prodPromo').value) : null;
-            const img = document.getElementById('prodImg').value || "https://via.placeholder.com/150";
-            const cat = document.getElementById('prodCat').value || "General";
-            const hasStock = document.getElementById('prodStock').checked;
-
-            if (!name || isNaN(price)) return alert("Falta nombre o precio");
-
-            if (idInput) {
-                const idx = products.findIndex(p => p.id == idInput);
-                if (idx !== -1) products[idx] = { ...products[idx], name, price, promoPrice: promo, img, cat, hasStock };
-            } else {
-                products.push({ id: Date.now(), name, price, promoPrice: promo, img, cat, hasStock });
-            }
+        // Función para leer el CSV de Google
+        function parseCSV(csvText) {
+            const rows = csvText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
+            const headers = rows.shift().split(','); // Quitamos la fila 1 (títulos)
             
-            saveData();
-            resetForm();
-            renderCategories();
-            renderProducts(activeCategory);
+            return rows.map(row => {
+                const values = row.split(','); 
+                
+                // Mapeo seguro: id, nombre, precio, promo, categoria, imagen, stock
+                // Si tu hoja tiene otro orden, esto podría fallar.
+                return {
+                    id: values[0] || Date.now(),
+                    name: values[1] || "Sin Nombre",
+                    price: parseFloat(values[2]) || 0,
+                    promoPrice: values[3] ? parseFloat(values[3]) : null,
+                    cat: values[4] || "Varios",
+                    img: values[5] || "",
+                    hasStock: (values[6] || "").toUpperCase().includes('SI')
+                };
+            });
         }
 
-        function deleteProduct(id) {
-            if(!confirm("¿Borrar?")) return;
-            products = products.filter(p => p.id !== id);
-            saveData();
-            renderProducts(activeCategory);
-            renderCategories();
-        }
-
-        function editProduct(id) {
-            const p = products.find(x => x.id === id);
-            if (!p) return;
-            if(!document.getElementById('appBody').classList.contains('admin-visible')) toggleAdmin();
-            document.getElementById('editId').value = p.id;
-            document.getElementById('prodName').value = p.name;
-            document.getElementById('prodPrice').value = p.price;
-            document.getElementById('prodPromo').value = p.promoPrice || '';
-            document.getElementById('prodImg').value = p.img;
-            document.getElementById('prodCat').value = p.cat;
-            document.getElementById('prodStock').checked = p.hasStock;
-            document.getElementById('formTitle').innerText = "Editar Producto";
-            document.getElementById('btnSave').innerText = "Actualizar";
-            document.getElementById('btnCancel').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function resetForm() {
-            document.getElementById('editId').value = '';
-            document.getElementById('prodName').value = '';
-            document.getElementById('prodPrice').value = '';
-            document.getElementById('prodPromo').value = '';
-            document.getElementById('prodImg').value = '';
-            document.getElementById('prodStock').checked = true;
-            document.getElementById('formTitle').innerText = "Agregar Producto";
-            document.getElementById('btnSave').innerText = "Guardar";
-            document.getElementById('btnCancel').style.display = 'none';
-        }
-
-        /* --- UI RENDER --- */
+        /* --- RENDER --- */
         function renderCategories() {
             const cats = ['Todos', ...new Set(products.map(p => p.cat))];
             const c = document.getElementById('catContainer');
-            c.innerHTML = ''; document.getElementById('catList').innerHTML = '';
+            c.innerHTML = ''; 
             cats.forEach(x => {
                 const key = x === 'Todos' ? 'all' : x;
                 c.innerHTML += `<button class="cat-btn ${activeCategory===key?'active':''}" onclick="filter('${key}')">${x}</button>`;
-                if(x!=='Todos') document.getElementById('catList').innerHTML += `<option value="${x}">`;
             });
         }
 
@@ -271,8 +142,12 @@
             const g = document.getElementById('productGrid');
             g.innerHTML = '';
             const list = filter === 'all' ? products : products.filter(p => p.cat === filter);
-            if (list.length === 0) return g.innerHTML = '<p style="text-align:center;width:100%;color:#999">Sin productos</p>';
             
+            if(list.length === 0) {
+                 g.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#999">No hay productos en esta categoría.</p>';
+                 return;
+            }
+
             list.forEach(p => {
                 const isPromo = p.promoPrice && p.promoPrice < p.price;
                 const priceDisplay = isPromo 
@@ -281,19 +156,15 @@
                 
                 g.innerHTML += `
                     <div class="card ${!p.hasStock?'no-stock':''}">
-                        <div class="admin-actions">
-                            <button class="action-btn btn-edit" onclick="editProduct(${p.id})">✏️</button>
-                            <button class="action-btn btn-del" onclick="deleteProduct(${p.id})">🗑️</button>
-                        </div>
                         <div class="card-img-container">
                             ${isPromo ? '<div class="badge badge-promo">OFERTA</div>' : ''}
                             ${!p.hasStock ? '<div class="badge badge-stock">AGOTADO</div>' : ''}
-                            <img src="${p.img}" class="card-img" loading="lazy">
+                            <img src="${p.img}" class="card-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen'">
                         </div>
                         <div class="card-body">
                             <h4 class="card-title">${p.name}</h4>
                             <div class="price-container">${priceDisplay}</div>
-                            <button class="add-btn" onclick="addToCart(${p.id})" ${!p.hasStock?'disabled':''}>${p.hasStock?'Agregar':'Sin Stock'}</button>
+                            <button class="add-btn" onclick="addToCart('${p.id}')" ${!p.hasStock?'disabled':''}>${p.hasStock?'Agregar':'Sin Stock'}</button>
                         </div>
                     </div>`;
             });
@@ -322,7 +193,7 @@
                 msg += `- ${i.name} (x${i.c}): $${pr*i.c}%0A`;
             });
             msg += `%0ATotal: $${cart.reduce((s,x)=>s+(x.promoPrice||x.price),0)}`;
-            document.getElementById('waLink').href = `https://wa.me/${config.phone.replace(/[^0-9]/g,"")}?text=${msg}`;
+            document.getElementById('waLink').href = `https://wa.me/${PHONE_NUMBER}?text=${msg}`;
             document.getElementById('cartModal').style.display = 'flex';
         }
         function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
